@@ -2,36 +2,42 @@ var weather = {
 
 }
 
-function UserInterface() {
-
-	// Public fields
+var UserInterface = function() {
 	this.TEMP_TAG = "h1";
 	this.DESC_TAG = "h2";
+	this.OPTION_ID = ".option";
 
-	// Private fields
-	var top = $('.option#top'),
-		bottom = $('.option#bottom'),
+	var options = [];
 
-		topTemp = top.children(this.TEMP_TAG),
-		topDesc = top.children(this.DESC_TAG),
-
-		bottomTemp = bottom.children(this.TEMP_TAG),
-		bottomDesc = bottom.children(this.DESC_TAG)
-
-	// Public methods
-	this.removeTop = function() {
-		top.remove();
+	for (var i = 0; i < $(this.OPTION_ID).length; i++) {
+		var currentOption = $(this.OPTION_ID + ":eq(" + i + ")");
+		options[i] = {
+			outer: currentOption,
+			temp: currentOption.children(this.TEMP_TAG),
+			desc: currentOption.children(this.DESC_TAG)
+		}
 	}
 
-	// Private methods
-	var removeTop = function() {
-		top.remove();
+	this.setForcast = function(index, temp, desc) {
+		options[index].temp.text(temp);
+		options[index].desc.text(desc);
+	}
+
+	/* Sets the option's background given a
+	 * hex code
+	 */
+	this.setBackground = function(index, hex) {
+		if (hex.charAt(0) !== "#") {
+			hex = "#" + hex;
+		}
+		options[index].outer.css({
+			background: hex
+		});
 	}
 }
 
 $(function(){
-	// Main loop
 	var userInterface = new UserInterface();
-	userInterface.removeTop();
-	console.log(userInterface.TEMP_TAG);
+	userInterface.setForcast(0, 69, "eyyy");
+	userInterface.setBackground(0, "#00ff00");
 });
