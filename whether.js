@@ -1,6 +1,7 @@
-var weather = {
+var WeatherAPI = function(){
 
 }
-$(function(){
 
+$(function(){
+	var weatherAPI = new WeatherAPI();
 });
