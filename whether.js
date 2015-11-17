@@ -1,4 +1,4 @@
-var GameState = function() {
+var Game = function() {
 	var city = "";
 	var country = "";
 	var temp = 69;
