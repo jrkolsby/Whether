@@ -1,45 +1,76 @@
-html { height: 100% }
-body {
+body, html {
 	width: 100%;
 	height: 100%;
-	overflow: none;
 }
-.option {
-	width: 100%;
-	height: 50%;
-	display: block;
-	position: relative;
-	border-top: 3px solid white;
-	border-bottom: 3px solid white;
+section#sidebar {
+	width: 400px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: #FF4C4C;
+	padding: 30px;
+	max-width: 100%;
+}
+h1 {
+	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+	text-transform: uppercase;
+	font-weight: 700;
+	font-size: 3.5em;
+	line-height: 125%;
+	color: #fff;
+	margin-bottom: 20px;
+}
+h4 {
+	font-family: 'PT Serif', 'Georgia', 'Baskerville', serif;
+	font-weight: 400;
+	font-style: italic;
+	font-size: 2.2em;
+	color: #fff;
+}
+div#forcast {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	padding: 40px;
+	transform: translate(-50%,-50%);
+	-ms-transform: translate(-50%,-50%);
+	-webkit-transform: translate(-50%,-50%);
 
-	cursor: pointer;
+	/* Prevent highlight */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    cursor: move !important;
 }
-.option:first-of-type {
-	border-top: none;
-	z-index: 2;
-}
-.option:last-of-type { border-bottom: none }
-.option h1 {
-	top: calc(50% - 25px);
-	width: 100%;
+span.temp,
+span.desc {
+	display: block;
 	color: #fff;
-	position: absolute;
-	font-size: 6em;
-	transform: translateY(-50%);
 	text-align: center;
-	font-family: 'Helvetica Neue', sans-serif;
-	font-weight: 800;
 }
-.option h2 {
-	top: calc(50% + 45px);
-	color: #fff;
-	width: 100%;
-	position: absolute;
-	font-size: 1.6em;
-	transform: translateY(-50%);
-	text-align: center;
-	font-family: 'Helvetica Neue', sans-serif;
-	font-weight: 600;
+span.temp {
+	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+	font-weight: 400;
+	font-size: 7em;
 }
-.option#top { background: #EE2524 }
-.option#bottom { background: #F7C315 }
+span.desc {
+	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+	font-weight: 400;
+	font-size: 1.7em;
+}
+@media screen and (max-height: 720px) {
+	div#forcast {
+		position: relative;
+		top: 0;
+		left: 0;
+		transform: none;
+		-ms-transform: none;
+		-webkit-transform: none;
+	}
+}
+@media screen and (max-height: )
