@@ -4,6 +4,7 @@ var UserInterface = function(g) {
 		SCROLL_DESC_RATIO = 100;
 
 	var element = {
+		sidebar: $("#sidebar"),
 		city: $("#sidebar h1"),
 		country: $("#sidebar h4"),
 		temp: $("#forcast .temp"),
@@ -18,7 +19,21 @@ var UserInterface = function(g) {
 	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setDescription = function(d) { element.desc.text(d) }
 
-	$(window).on('mousewheel', function(event, delta) {
+	$(window).on('keydown', function(event) {
+		switch(event.keyCode) {
+			case 37:
+				g.prevDesc();
+				break;
+			case 38:
+				g.changeTemperature(1);
+				break;
+			case 39:
+				g.nextDesc();
+				break;
+			case 40:
+				g.changeTemperature(-1);
+		}
+	}).on('mousewheel', function(event) {
 
 		scrollIncrementX += event.deltaX;
 		scrollIncrementY += event.deltaY;
@@ -45,13 +60,14 @@ var UserInterface = function(g) {
 
 var Game = function() {
 	var state = {
-		city: "",
-		country: "",
+		city: "Rio de Janeiro",
+		country: "Brazil",
 		temp: 69,
 		desc: ["Cloudy", "Rainyish", "Meatballs"],
-		descId: 0
-	},
-		userInterface = new UserInterface(this);
+		descId: 1
+	}
+	
+	var	userInterface = new UserInterface(this);
 
 	this.setCity = function(c) { city = c }
 	this.setCountry = function(c) { country = c }
@@ -83,6 +99,13 @@ var Game = function() {
 		state.descId -= 1;
 		updateDesc();
 	}
+
+
+	userInterface.setCity(state.city);
+	userInterface.setCountry(state.country);
+	userInterface.setTemperature(state.temp);
+	var newDesc = state.desc[state.descId];
+	userInterface.setDescription(newDesc);
 }
 
 $(document).ready(function() {
