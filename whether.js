@@ -1,6 +1,7 @@
-var UserInterface = function() {
+var UserInterface = function(g) {
 
-	var SCROLL_TEMP_RATIO = 20;
+	var SCROLL_TEMP_RATIO = 50,
+		SCROLL_DESC_RATIO = 100;
 
 	var element = {
 		city: $("#sidebar h1"),
@@ -9,34 +10,83 @@ var UserInterface = function() {
 		desc: $("#forcast .desc"),
 		icon: $("#forcast .icon")
 	},
-		scrollIncrement = 0;
+		scrollIncrementY = 0,
+		scrollIncrementX = 0;
 
-	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setCity = function(c) { element.city.text(c) }
 	this.setCountry = function(c) { element.country.text(c) }
+	this.setTemperature = function(t) { element.temp.text(t) }
+	this.setDescription = function(d) { element.desc.text(d) }
 
 	$(window).on('mousewheel', function(event, delta) {
-		scrollIncrement += event.originalEvent.deltaY;
-		if (scrollIncrement >= SCROLL_TEMP_RATIO) {
 
+		scrollIncrementX += event.originalEvent.deltaX;
+		scrollIncrementY += event.originalEvent.deltaY;
+
+		console.log("scroll");
+		
+		if (Math.abs(scrollIncrementY) >= SCROLL_TEMP_RATIO) {
+
+			var inc = 1;
+			var dt = inc * (scrollIncrementY / Math.abs(scrollIncrementY));
+
+			g.changeTemperature(dt);
+			scrollIncrementY = 0;
+		}
+		if (Math.abs(scrollIncrementX) >= SCROLL_DESC_RATIO) {
+
+			if (scrollIncrementX > 0) {
+				g.nextDesc();
+			} else {
+				g.prevDesc();
+			}
+			scrollIncrementX = 0;
 		}
 	});
 }
 
 var Game = function() {
-	var city = "";
-	var country = "";
-	var temp = 69;
-	var desc = [];
-	var descId = 0;
+	var state = {
+		city: "",
+		country: "",
+		temp: 69,
+		desc: ["Cloudy", "Rainyish", "Meatballs"],
+		descId: 0
+	},
+		userInterface = new UserInterface(this);
 
 	this.setCity = function(c) { city = c }
 	this.setCountry = function(c) { country = c }
-	this.setTemperature = function(t) { temp = t }
-	this.setDescId = function(id) { descId = id }
+	this.changeTemperature = function(dt) { 
+		state.temp += dt;
+		userInterface.setTemperature(state.temp);
+	}
+
+	var updateDesc = function() {
+		/* TODO:
+		 * - Replace with ternary statement
+		 * - Learn what a ternary statement is
+		 */
+		if (state.descId >= state.desc.length) {
+			state.descId = 0;
+		} else if (state.descId < 0) {
+			state.descId = state.desc.length-1;
+		}
+
+		var newDesc = state.desc[state.descId]
+		userInterface.setDescription(newDesc);
+	}
+
+	this.nextDesc = function() {
+		state.descId += 1;
+		updateDesc();
+	}
+	this.prevDesc = function() {
+		state.descId -= 1;
+		updateDesc();
+	}
 }
 
 $(document).ready(function() {
-	var userInterface = new UserInterface();
-	userInterface.setTemperature(100);
+	var whether = new Game();
 });
