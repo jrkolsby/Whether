@@ -1,3 +1,11 @@
+var gameState = {
+	city: "",
+	country: "",
+	temp: 0,
+	desc: [],
+	descId: 0
+}
+
 var UserInterface = function() {
 
 	var SCROLL_TEMP_RATIO = 20;
