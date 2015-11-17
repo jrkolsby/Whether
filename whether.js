@@ -1,9 +1,14 @@
-var gameState = {
-	city: "",
-	country: "",
-	temp: 0,
-	desc: [],
-	descId: 0
+var GameState = function() {
+	var city = "";
+	var country = "";
+	var temp = 69;
+	var desc = [];
+	var descId = 0;
+
+	this.setCity = function(c) { city = c }
+	this.setCountry = function(c) { country = c }
+	this.setTemperature = function(t) { temp = t }
+	this.setDescId = function(id) { descId = id }
 }
 
 var UserInterface = function() {
