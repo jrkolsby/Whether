@@ -3,6 +3,9 @@ var UserInterface = function(g) {
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
 
+	var DRAG_TEMP_RATIO = 25,
+		DRAG_DESC_RATIO = 50;
+
 	var element = {
 		sidebar: $("#sidebar"),
 		city: $("#sidebar h1"),
@@ -12,12 +15,42 @@ var UserInterface = function(g) {
 		icon: $("#forcast .icon")
 	},
 		scrollIncrementY = 0,
-		scrollIncrementX = 0;
+		scrollIncrementX = 0,
+		dragIncrementY = 0,
+		dragIncrementX = 0;
 
 	this.setCity = function(c) { element.city.text(c) }
 	this.setCountry = function(c) { element.country.text(c) }
 	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setDescription = function(d) { element.desc.text(d) }
+
+	var handleIncrements = function(incrementX,
+								    incrementY,
+								    ratioX, ratioY) {
+
+		var resetX = false;
+		var resetY = false;
+
+		if (Math.abs(incrementY) >= ratioY) {
+
+			var inc = 1;
+			var dt = inc * (incrementY / Math.abs(incrementY));
+
+			g.changeTemperature(dt);
+
+			resetY = true;
+		}
+		if (Math.abs(incrementX) >= ratioX) {
+
+			if (incrementX > 0) { 
+				g.nextDesc()
+			} else { g.prevDesc() }
+
+			resetX = true;
+		}
+
+		return [resetX, resetY];
+	}
 
 	$(window).on('keydown', function(event) {
 		switch(event.keyCode) {
@@ -35,26 +68,32 @@ var UserInterface = function(g) {
 		}
 	}).on('mousewheel', function(event) {
 
-		scrollIncrementX += event.deltaX;
-		scrollIncrementY += event.deltaY;
+		scrollIncrementX -= event.deltaX;
+		scrollIncrementY -= event.deltaY;
 
-		if (Math.abs(scrollIncrementY) >= SCROLL_TEMP_RATIO) {
+		var resetXY =
+		handleIncrements(scrollIncrementX,
+						 scrollIncrementY,
+						 SCROLL_DESC_RATIO,
+						 SCROLL_TEMP_RATIO);
 
-			var inc = 1;
-			var dt = inc * (scrollIncrementY / Math.abs(scrollIncrementY));
+		if (resetXY[0]) { scrollIncrementX = 0 }
+		if (resetXY[1]) { scrollIncrementY = 0 }
+	});
 
-			g.changeTemperature(dt);
-			scrollIncrementY = 0;
-		}
-		if (Math.abs(scrollIncrementX) >= SCROLL_DESC_RATIO) {
+	element.sidebar.bind('move', function(event) {
 
-			if (scrollIncrementX > 0) {
-				g.nextDesc();
-			} else {
-				g.prevDesc();
-			}
-			scrollIncrementX = 0;
-		}
+		dragIncrementX -= event.deltaX;
+		dragIncrementY -= event.deltaY;
+
+		var resetXY =
+		handleIncrements(dragIncrementX,
+						 dragIncrementY,
+						 DRAG_DESC_RATIO,
+						 DRAG_TEMP_RATIO);
+
+		if (resetXY[0]) { dragIncrementX = 0 }
+		if (resetXY[1]) { dragIncrementY = 0 }
 	});
 }
 
@@ -69,8 +108,8 @@ var Game = function() {
 	
 	var	userInterface = new UserInterface(this);
 
-	this.setCity = function(c) { city = c }
-	this.setCountry = function(c) { country = c }
+	var setCity = function(c) { city = c }
+	var setCountry = function(c) { country = c }
 	this.changeTemperature = function(dt) { 
 		state.temp += dt;
 		userInterface.setTemperature(state.temp);
