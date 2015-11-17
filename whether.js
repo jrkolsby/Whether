@@ -20,11 +20,9 @@ var UserInterface = function(g) {
 
 	$(window).on('mousewheel', function(event, delta) {
 
-		scrollIncrementX += event.originalEvent.deltaX;
-		scrollIncrementY += event.originalEvent.deltaY;
+		scrollIncrementX += event.deltaX;
+		scrollIncrementY += event.deltaY;
 
-		console.log("scroll");
-		
 		if (Math.abs(scrollIncrementY) >= SCROLL_TEMP_RATIO) {
 
 			var inc = 1;
