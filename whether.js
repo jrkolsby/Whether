@@ -1,10 +1,13 @@
-var UserInterface = function(g) {
+var UserInterface = function(game) {
 
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
 
 	var DRAG_TEMP_RATIO = 25,
 		DRAG_DESC_RATIO = 50;
+
+	this.DIRECTION_LEFT = 0;
+	this.DIRECTION_RIGHT = 1;
 
 	var element = {
 		sidebar: $("#sidebar"),
@@ -22,7 +25,17 @@ var UserInterface = function(g) {
 	this.setCity = function(c) { element.city.text(c) }
 	this.setCountry = function(c) { element.country.text(c) }
 	this.setTemperature = function(t) { element.temp.text(t) }
-	this.setDescription = function(d) { element.desc.text(d) }
+	this.setDescription = function(d, dir) {
+		if (dir == this.DIRECTION_LEFT) {
+			element.desc.addClass("left");
+			element.desc.text(d);
+			element.desc.removeClass("left");
+		} else if (dir == this.DIRECTION_RIGHT) {
+			element.desc.addClass("right");
+			element.desc.text(d);
+			element.desc.removeClass("right");			
+		}
+	}
 
 	var handleIncrements = function(incrementX,
 								    incrementY,
@@ -36,15 +49,14 @@ var UserInterface = function(g) {
 			var inc = 1;
 			var dt = inc * (incrementY / Math.abs(incrementY));
 
-			g.changeTemperature(dt);
+			game.changeTemperature(dt);
 
 			resetY = true;
 		}
 		if (Math.abs(incrementX) >= ratioX) {
 
-			if (incrementX > 0) { 
-				g.nextDesc()
-			} else { g.prevDesc() }
+			if (incrementX > 0) { game.nextDesc() } 
+			else { game.prevDesc() }
 
 			resetX = true;
 		}
@@ -55,16 +67,16 @@ var UserInterface = function(g) {
 	$(window).on('keydown', function(event) {
 		switch(event.keyCode) {
 			case 37:
-				g.prevDesc();
+				game.prevDesc();
 				break;
 			case 38:
-				g.changeTemperature(1);
+				game.changeTemperature(1);
 				break;
 			case 39:
-				g.nextDesc();
+				game.nextDesc();
 				break;
 			case 40:
-				g.changeTemperature(-1);
+				game.changeTemperature(-1);
 		}
 	}).on('mousewheel', function(event) {
 
@@ -115,28 +127,22 @@ var Game = function() {
 		userInterface.setTemperature(state.temp);
 	}
 
-	var updateDesc = function() {
-		/* TODO:
-		 * - Replace with ternary statement
-		 * - Learn what a ternary statement is
-		 */
-		if (state.descId >= state.desc.length) {
-			state.descId = 0;
-		} else if (state.descId < 0) {
-			state.descId = state.desc.length-1;
-		}
+	var updateDesc = function(dir) {
+
+		if (state.descId >= state.desc.length) { state.descId = 0 }
+		else if (state.descId < 0) { state.descId = state.desc.length-1 }
 
 		var newDesc = state.desc[state.descId]
-		userInterface.setDescription(newDesc);
+		userInterface.setDescription(newDesc, dir);
 	}
 
 	this.nextDesc = function() {
 		state.descId += 1;
-		updateDesc();
+		updateDesc(userInterface.DIRECTION_RIGHT);
 	}
 	this.prevDesc = function() {
 		state.descId -= 1;
-		updateDesc();
+		updateDesc(userInterface.DIRECTION_LEFT);
 	}
 
 

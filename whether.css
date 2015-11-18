@@ -53,6 +53,7 @@ span.desc {
 	display: block;
 	color: #fff;
 	text-align: center;
+	position: relative;
 }
 span.temp {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
@@ -63,7 +64,25 @@ span.desc {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	font-weight: 400;
 	font-size: 1.7em;
+
+	transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
+	-o-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
+	-moz-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
+	-webkit-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
 }
+span.desc.left,
+span.desc.right {
+	opacity: 0;
+
+	transition: none;
+	-o-transition: none;
+	-moz-transition: none;
+	-webkit-transition: none;
+}
+
+span.desc.left { right: 40px }
+span.desc.right { left: 40px }
+
 @media screen and (max-height: 720px) {
 	div#forcast {
 		position: relative;
