@@ -2,24 +2,39 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+
+	<!-- iOS webapp specifics -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<meta name = "viewport" content = "initial-scale = 1, user-scalable = no">
+
+	<!-- Google font families -->
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700|PT+Serif:400italic' rel='stylesheet' type='text/css'>
+
+	<!-- CSS -->
 	<link rel="stylesheet" type="text/css" href="html5.css">
 	<link rel="stylesheet" type="text/css" href="whether.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+	<!-- JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
 	<script type="text/javascript" src="CityIDList.js"></script>
 	<script type="text/javascript" src="whether.js"></script>
 	<title>Whether</title>
 </head>
 <body>
-	<div class="option" id="top">
-		<h1>56</h1>
-		<h2>Amsterdam</h2>
-	</div>
-	<div class="option" id="bottom">
-		<h1>32</h1>
-		<h2>Atlanta, GA</h2>		
-	</div>
-	<div class="option">
-		
-	</div>
+	<section id="sidebar">
+		<h1>Rio de Janiero</h1>
+		<h4>Brazil</h4>
+		<div id="forcast">
+			<div class="icon"></div>
+			<span class="temp">
+				68
+			</span>
+			<span class="desc">
+				Cloudy
+			</span>
+		</div>
+	</section>
 </body>
 </html>
