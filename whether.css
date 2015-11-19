@@ -14,14 +14,14 @@ section#sidebar {
 	max-width: 100%;
 
 	/* Prevent highlight */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 
-    cursor: move !important;
+	cursor: move !important;
 }
 h1 {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
@@ -64,24 +64,19 @@ span.desc {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	font-weight: 400;
 	font-size: 1.7em;
-
-	transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
-	-o-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
-	-moz-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
-	-webkit-transition: 0.3s left ease-in-out, 0.3s opacity ease-in-out;
 }
-span.desc.left,
-span.desc.right {
-	opacity: 0;
-
-	transition: none;
-	-o-transition: none;
-	-moz-transition: none;
-	-webkit-transition: none;
+span.desc.animate {
+	transition: 2s left ease-in-out, 2s opacity ease-in-out;
+	-o-transition: 2s left ease-in-out, 2s opacity ease-in-out;
+	-moz-transition: 2s left ease-in-out, 2s opacity ease-in-out;
+	-webkit-transition: 2s left ease-in-out, 2s opacity ease-in-out;
 }
 
-span.desc.left { right: 40px }
-span.desc.right { left: 40px }
+span.desc.left { left: -40px; }
+span.desc.right { left: 40px; }
+span.desc.left, span.desc.right {
+	opacity: 1;
+}
 
 @media screen and (max-height: 720px) {
 	div#forcast {

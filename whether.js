@@ -14,10 +14,13 @@ var UserInterface = function(game) {
 		city: $("#sidebar h1"),
 		country: $("#sidebar h4"),
 		temp: $("#forcast .temp"),
-		desc: $("#forcast .desc"),
+		desc: [$("#forcast .desc.one"),
+			   $("#forcast .desc.two")],
+		currentDesc: 0,
 		icon: $("#forcast .icon")
-	},
-		scrollIncrementY = 0,
+	}
+
+	var	scrollIncrementY = 0,
 		scrollIncrementX = 0,
 		dragIncrementY = 0,
 		dragIncrementX = 0;
@@ -26,15 +29,25 @@ var UserInterface = function(game) {
 	this.setCountry = function(c) { element.country.text(c) }
 	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setDescription = function(d, dir) {
-		if (dir == this.DIRECTION_LEFT) {
-			element.desc.addClass("left");
-			element.desc.text(d);
-			element.desc.removeClass("left");
-		} else if (dir == this.DIRECTION_RIGHT) {
-			element.desc.addClass("right");
-			element.desc.text(d);
-			element.desc.removeClass("right");			
-		}
+
+		element.desc[element.currentDesc].text(d);
+
+		/* FUUUCCCCCKKKKKK
+		var current = element.desc[element.currentDesc];
+
+		element.currentDesc = 1-element.currentDesc;
+		var next = element.desc[element.currentDesc];
+
+		next.removeClass("animate");
+		console.log("remove animate");
+		next.addClass("left");
+		next.removeClass("right");
+		//next.addClass("animate");
+		next.text(d);
+
+		next.removeClass("left");
+		current.addClass("right");
+		*/
 	}
 
 	var handleIncrements = function(incrementX,
@@ -56,7 +69,7 @@ var UserInterface = function(game) {
 		if (Math.abs(incrementX) >= ratioX) {
 
 			if (incrementX > 0) { game.nextDesc() } 
-			else { game.prevDesc() }
+			else { game.lastDesc() }
 
 			resetX = true;
 		}
@@ -67,7 +80,7 @@ var UserInterface = function(game) {
 	$(window).on('keydown', function(event) {
 		switch(event.keyCode) {
 			case 37:
-				game.prevDesc();
+				game.lastDesc();
 				break;
 			case 38:
 				game.changeTemperature(1);
@@ -111,10 +124,10 @@ var UserInterface = function(game) {
 
 var Game = function() {
 	var state = {
-		city: "Rio de Janeiro",
-		country: "Brazil",
-		temp: 69,
-		desc: ["Cloudy", "Rainyish", "Meatballs"],
+		city: "Lorem Ipsum Dolor",
+		country: "Sit Amet",
+		temp: 52,
+		desc: ["One", "Two", "Three"],
 		descId: 1
 	}
 	
@@ -140,7 +153,7 @@ var Game = function() {
 		state.descId += 1;
 		updateDesc(userInterface.DIRECTION_RIGHT);
 	}
-	this.prevDesc = function() {
+	this.lastDesc = function() {
 		state.descId -= 1;
 		updateDesc(userInterface.DIRECTION_LEFT);
 	}
@@ -155,4 +168,5 @@ var Game = function() {
 
 $(document).ready(function() {
 	var whether = new Game();
+	console.log(whether);
 });
