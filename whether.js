@@ -2,9 +2,6 @@ var WeatherAPI = function(){
 	//needs to be replaced with something that fits the implementation
 	var cityIDList = storedIDList;
 	var cityLength = cityIDList.length;
-
-	//list of valid weatherStates
-	var validStates = ["Thunderstorm", "Drizzle", "Rain", "Snow", "Atmosphere", "Clear", "Clouds", "Extreme", "Additional"]
 	
 	//states
 	var randNum = 0;
@@ -16,6 +13,7 @@ var WeatherAPI = function(){
 	var tempC;
 	var tempF;
 	var weatherState;
+	var weatherStateString;
 	var weatherData;
 
 
@@ -36,10 +34,11 @@ var WeatherAPI = function(){
 			cityName = data.name;
 			cityCoord = [data.coord.lon, data.coord.lat];
 			tempK = data.main.temp;
-			weatherState = data.weather[0].main;
+			weatherState = data.weather[0].id;
 			tempC = tempK - 273.15;
 			tempF = Math.round(tempC * 1.8 + 32);
 			tempC = Math.round(tempC);
+			weatherStateString = weatherStateList[weatherState];
 		});
 		
 	}
@@ -74,8 +73,10 @@ var WeatherAPI = function(){
 	this.getWeather = function(){
 		//return weather as a string
 		console.log(weatherState);
-		return weatherState;
+		console.log(weatherStateString);
+		return weatherStateString;
 	}
+}
 
 var UserInterface = function() {
 
