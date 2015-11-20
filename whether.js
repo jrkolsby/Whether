@@ -84,6 +84,30 @@ var WeatherAPI = function(){
 	}
 }
 
+var MapAPI = function() {
+	//options for google maps API V3
+	var myOptions = {
+         zoom: 5,
+         center: new google.maps.LatLng(40.7127, 74.0059),
+         mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    //set the coordinate for the map
+    this.setCoord = function(aLat, aLong){
+    	myOptions.center = new google.maps.LatLng(aLat, aLong);
+    }
+
+    //set the zoom level for the map
+    this.setZoom = function(aZoom){
+    	myOptions.zoom = aZoom;
+    }
+
+    //set the imbedded map to the stored options
+    this.setMap = function(){
+    	var map = new google.maps.Map(document.getElementById("map"), myOptions);
+    }
+}
+
 var UserInterface = function() {
 
 	var SCROLL_TEMP_RATIO = 20;
