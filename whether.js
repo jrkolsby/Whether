@@ -1,12 +1,16 @@
 var WeatherAPI = function(){
-	//needs to be replaced with something that fits the implementation
+	//import and store IDList to avoid manipulation
 	var cityIDList = storedIDList;
 	var cityLength = cityIDList.length;
 	
-	//states
+	//random gen states
 	var randNum = 0;
 	var randCityID = 0;
+
+	//API ID
 	var APPID = "b5e65ae554c826b7a756605c6be424cb";
+
+	//weather states
 	var cityName;
 	var cityCoord;
 	var tempK;
@@ -16,7 +20,7 @@ var WeatherAPI = function(){
 	var weatherStateString;
 	var weatherData;
 
-
+	//set a new random city
 	this.setRandCity = function(){
 		//generate random number, generate random city ID
 		randNum = Math.random();
@@ -31,21 +35,23 @@ var WeatherAPI = function(){
 		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + APPID, function(data){
 			weatherData = data;
 			console.log(weatherData);
+
+			//parse data from JSON
 			cityName = data.name;
 			cityCoord = [data.coord.lon, data.coord.lat];
 			tempK = data.main.temp;
 			weatherState = data.weather[0].id;
+
+			//convert temperature and store as integers
 			tempC = tempK - 273.15;
 			tempF = Math.round(tempC * 1.8 + 32);
 			tempC = Math.round(tempC);
+
+			//store weather state string relative to the id.
 			weatherStateString = weatherStateList[weatherState];
 		});
-		
 	}
 
-	
-
-	//should just be returning fields at this point
 	this.getCityName = function(){
 		//return string of city name
 		console.log(cityName);
@@ -53,19 +59,19 @@ var WeatherAPI = function(){
 	}
 
 	this.getCoord = function(){
-		//return array with {latitude, longitude}
+		//return array with [latitude, longitude]
 		console.log(cityCoord);
 		return cityCoord;
 	}
 
 	this.getTempC = function(){
-		//return temperature in celsius
+		//return temperature in celsius (int)
 		console.log(tempC + " celsius");
 		return tempC;
 	}
 
 	this.getTempF = function(){
-		//return temperature in fahrenheit
+		//return temperature in fahrenheit (int)
 		console.log(tempF + " fahrenheit");
 		return tempF;
 	}
@@ -120,6 +126,8 @@ $(document).ready(function() {
 	var userInterface = new UserInterface();
 	var weatherAPI = new WeatherAPI();
 	weatherAPI.setRandCity();
+
+	//delay required to allow API to finish
 	setTimeout(function(){
 		weatherAPI.getCityName();
 		weatherAPI.getCoord();
@@ -127,5 +135,6 @@ $(document).ready(function() {
 		weatherAPI.getTempF();
 		weatherAPI.getWeather();
 	}, 500);
+
 	userInterface.setTemperature(100);
 });
