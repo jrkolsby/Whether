@@ -6,7 +6,7 @@ body, html {
 section#sidebar {
 	width: 400px;
 	height: 100%;
-	position: absolute;
+	display: none;
 	top: 0;
 	left: 0;
 	background: #FF4C4C;
@@ -23,6 +23,7 @@ section#sidebar {
 
     cursor: move !important;
 }
+
 h1 {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	text-transform: uppercase;
