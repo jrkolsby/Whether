@@ -12,7 +12,7 @@ var WeatherAPI = function(){
 
 	//weather states
 	var cityName;
-	var cityCoord;
+	var cityCoord = {lat: 0, lng: 0};
 	var tempK;
 	var tempC;
 	var tempF;
@@ -38,7 +38,7 @@ var WeatherAPI = function(){
 
 			//parse data from JSON
 			cityName = data.name;
-			cityCoord = [data.coord.lon, data.coord.lat];
+			cityCoord = {lat: parseFloat(data.coord.lat), lng: parseFloat(data.coord.lon)};
 			tempK = data.main.temp;
 			weatherState = data.weather[0].id;
 
@@ -84,6 +84,40 @@ var WeatherAPI = function(){
 	}
 }
 
+var MapAPI = function() {
+	//options for google maps API V3
+	var LatLng = {lat: 0, lng: 0};
+
+	var myOptions = {
+         zoom: 5,
+         center: {lat: 0, lng: 0},
+         mapTypeId: google.maps.MapTypeId.ROADMAP,
+         disableDefaultUI: true,
+
+    };
+
+    //set the coordinate for the map
+    this.setCoord = function( aLatLng){
+    	myOptions.center = aLatLng;
+    	LatLng = aLatLng;
+    }
+
+    //set the zoom level for the map
+    this.setZoom = function(aZoom){
+    	myOptions.zoom = aZoom;
+    }
+
+    //set the imbedded map to the stored options
+    this.setMap = function(){
+    	var map = new google.maps.Map(document.getElementById("map"), myOptions);
+    	var marker = new google.maps.Marker({
+    		position: LatLng,
+    		map: map,
+    		title: 'Whether?'
+  		});
+    }
+}
+
 var UserInterface = function() {
 
 	var SCROLL_TEMP_RATIO = 20;
@@ -125,9 +159,10 @@ var Game = function() {
 $(document).ready(function() {
 	var userInterface = new UserInterface();
 	var weatherAPI = new WeatherAPI();
-	weatherAPI.setRandCity();
+	var mapAPI = new MapAPI();
 
 	//delay required to allow API to finish
+	weatherAPI.setRandCity();
 	setTimeout(function(){
 		weatherAPI.getCityName();
 		weatherAPI.getCoord();
@@ -136,5 +171,9 @@ $(document).ready(function() {
 		weatherAPI.getWeather();
 	}, 500);
 
-	userInterface.setTemperature(100);
+	setTimeout(function(){
+		mapAPI.setCoord(weatherAPI.getCoord());
+		mapAPI.setMap();
+	}, 1000);
+
 });
