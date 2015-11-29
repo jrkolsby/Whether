@@ -29,25 +29,7 @@ var UserInterface = function(game) {
 	this.setCountry = function(c) { element.country.text(c) }
 	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setDescription = function(d, dir) {
-
 		element.desc[element.currentDesc].text(d);
-
-		/* FUUUCCCCCKKKKKK
-		var current = element.desc[element.currentDesc];
-
-		element.currentDesc = 1-element.currentDesc;
-		var next = element.desc[element.currentDesc];
-
-		next.removeClass("animate");
-		console.log("remove animate");
-		next.addClass("left");
-		next.removeClass("right");
-		//next.addClass("animate");
-		next.text(d);
-
-		next.removeClass("left");
-		current.addClass("right");
-		*/
 	}
 
 	var handleIncrements = function(incrementX,
@@ -141,7 +123,6 @@ var Game = function() {
 	}
 
 	var updateDesc = function(dir) {
-
 		if (state.descId >= state.desc.length) { state.descId = 0 }
 		else if (state.descId < 0) { state.descId = state.desc.length-1 }
 
