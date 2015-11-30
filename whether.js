@@ -7,9 +7,6 @@ var WeatherAPI = function(){
 	var randNum = 0;
 	var randCityID = 0;
 
-	//API ID
-	var APPID = "b5e65ae554c826b7a756605c6be424cb";
-
 	//weather states
 	var cityName;
 	var cityCoord = {lat: 0, lng: 0};
