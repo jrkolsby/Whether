@@ -21,7 +21,7 @@ var WeatherAPI = function(){
 	var weatherData;
 
 	//set a new random city
-	this.setRandCity = function(){
+	this.setRandCity = function(completeCallback){
 		//generate random number, generate random city ID
 		randNum = Math.random();
 		for(var i = 0; i < cityLength; i++){
@@ -30,7 +30,6 @@ var WeatherAPI = function(){
 				break;
 			}
 		}
-		console.log(randCityID);
 		//call API and store to fields
 		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + APPID, function(data){
 			weatherData = data;
@@ -48,6 +47,8 @@ var WeatherAPI = function(){
 
 			//store weather state string relative to the id.
 			weatherStateString = weatherStateList[weatherState];
+
+			completeCallback();
 		});
 	}
 
@@ -58,7 +59,7 @@ var WeatherAPI = function(){
 	this.getWeather = function(){ return weatherStateString }
 }
 
-var MapAPI = function() {
+var Map = function(mapID) {
 	//options for google maps API V3
 	var LatLng = {lat: 0, lng: 0};
 
@@ -67,8 +68,14 @@ var MapAPI = function() {
          center: {lat: 0, lng: 0},
          mapTypeId: google.maps.MapTypeId.ROADMAP,
          disableDefaultUI: true,
-
     };
+
+	var map = new google.maps.Map(document.getElementById(mapID), myOptions);
+	var marker = new google.maps.Marker({
+		position: LatLng,
+		map: map,
+		title: 'Whether?'
+	});
 
     //set the coordinate for the map
     this.setCoord = function( aLatLng){
@@ -79,16 +86,6 @@ var MapAPI = function() {
     //set the zoom level for the map
     this.setZoom = function(aZoom){
     	myOptions.zoom = aZoom;
-    }
-
-    //set the imbedded map to the stored options
-    this.setMap = function(){
-    	var map = new google.maps.Map(document.getElementById("map"), myOptions);
-    	var marker = new google.maps.Marker({
-    		position: LatLng,
-    		map: map,
-    		title: 'Whether?'
-  		});
     }
 }
 
@@ -207,7 +204,6 @@ var Game = function() {
 		descId: 1
 	}
 
-
 	// Constrcut new user interface with callbacks for inherit events
 	var	userInterface = new UserInterface(function(d) {
 		changeTemperature(d);
@@ -247,26 +243,13 @@ var Game = function() {
 	var newDesc = state.desc[state.descId];
 	userInterface.setDescription(newDesc);
 
+	var map = new Map("map");
 
-	/*
-	var weatherAPI = new WeatherAPI();
-	var mapAPI = new MapAPI();
+	var weather = new WeatherAPI();
 
-	//delay required to allow API to finish
-	weatherAPI.setRandCity();
-	setTimeout(function(){
-		weatherAPI.getCityName();
-		weatherAPI.getCoord();
-		weatherAPI.getTempC();
-		weatherAPI.getTempF();
-		weatherAPI.getWeather();
-	}, 500);
-
-	setTimeout(function(){
-		mapAPI.setCoord(weatherAPI.getCoord());
-		mapAPI.setMap();
-	}, 1000);
-	*/
+	weather.setRandCity(function() {
+		console.log(weather.getCityName());
+	});
 }
 
 $(document).ready(function() {
