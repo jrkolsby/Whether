@@ -1,24 +1,69 @@
 var WeatherAPI = function(){
 	//import and store IDList to avoid manipulation
+
+	this.CELCIUS = 0;
+	this.FARENHEIT = 1;
+
+	var STATE_OPTIONS = 3;
+
 	var cityIDList = storedIDList;
 	var cityLength = cityIDList.length;
 	
-	//random gen states
 	var randNum = 0;
 	var randCityID = 0;
 
-	//weather states
 	var cityName;
 	var cityCoord = {lat: 0, lng: 0};
 	var tempK;
-	var tempC;
-	var tempF;
 	var weatherState;
 	var weatherStateString;
-	var weatherData;
+
+	var gameState = {};
+	var tempLocale = this.FARENHEIT;
+
+	var updateCityData = function(data) {
+		cityName = data.name;
+		cityCoord = {lat: parseFloat(data.coord.lat), lng: parseFloat(data.coord.lon)};
+
+		tempK = data.main.temp;
+
+		weatherState = data.weather[0].id;
+		weatherStateString = weatherStateList[weatherState];
+	}
+
+	var generateGameState = function() {
+
+		gameState.city = cityName;
+		gameState.coord = cityCoord.lat + ", " + cityCoord.lng;
+
+		switch(tempLocale) {
+			case this.FARENHEIT:
+				gameState.temp = Math.round(1.8*(tempK - 273.15)+32);
+				break;
+			case this.CELCIUS:
+				gameState.temp = Math.round(tempK - 273.15);
+				break;
+		}
+
+		var keys = Object.keys(weatherStateList);
+
+		gameState.weatherStates = [];
+
+		for (var i = 0; i < STATE_OPTIONS; i++) {
+			gameState.weatherStates.push(
+				weatherStateList[keys[ keys.length * Math.random() << 0]]
+			);
+		}
+
+		var randIndex = Math.floor(Math.random()*STATE_OPTIONS);
+		gameState.weatherStates = gameState.weatherStates
+										   .splice(randIndex, 0, weatherState)
+										   .join();
+		gameState.correctStateIndex = randIndex;
+	}
 
 	//set a new random city
-	this.setRandCity = function(completeCallback){
+	this.setCity = function(complete){
 		//generate random number, generate random city ID
 		randNum = Math.random();
 		for(var i = 0; i < cityLength; i++){
@@ -28,32 +73,14 @@ var WeatherAPI = function(){
 			}
 		}
 		//call API and store to fields
-		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + APPID, function(data){
-			weatherData = data;
-
-			//parse data from JSON
-			cityName = data.name;
-			cityCoord = {lat: parseFloat(data.coord.lat), lng: parseFloat(data.coord.lon)};
-			tempK = data.main.temp;
-			weatherState = data.weather[0].id;
-
-			//convert temperature and store as integers
-			tempC = tempK - 273.15;
-			tempF = Math.round(tempC * 1.8 + 32);
-			tempC = Math.round(tempC);
-
-			//store weather state string relative to the id.
-			weatherStateString = weatherStateList[weatherState];
-
-			completeCallback();
+		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + keys.weather, function(data){
+			updateCityData(data);
+			generateGameState();
+			complete();
 		});
 	}
-
-	this.getCityName = function(){ return cityName }
-	this.getCoord = function(){ return cityCoord }
-	this.getTempC = function(){ return tempC }
-	this.getTempF = function(){ return tempF }
-	this.getWeather = function(){ return weatherStateString }
+	this.getGameState = function() { return gameState }
+	this.setTempLocale = function(i) { tempLocale = i }
 }
 
 var Map = function(mapID) {
@@ -61,11 +88,11 @@ var Map = function(mapID) {
 	var LatLng = {lat: 0, lng: 0};
 
 	var myOptions = {
-         zoom: 5,
-         center: {lat: 0, lng: 0},
-         mapTypeId: google.maps.MapTypeId.ROADMAP,
-         disableDefaultUI: true,
-    };
+		 zoom: 5,
+		 center: {lat: 0, lng: 0},
+		 mapTypeId: google.maps.MapTypeId.ROADMAP,
+		 disableDefaultUI: true,
+	};
 
 	var map = new google.maps.Map(document.getElementById(mapID), myOptions);
 	var marker = new google.maps.Marker({
@@ -74,19 +101,19 @@ var Map = function(mapID) {
 		title: 'Whether?'
 	});
 
-    //set the coordinate for the map
-    this.setCoord = function( aLatLng){
-    	myOptions.center = aLatLng;
-    	LatLng = aLatLng;
-    }
+	//set the coordinate for the map
+	this.setCoord = function( aLatLng){
+		myOptions.center = aLatLng;
+		LatLng = aLatLng;
+	}
 
-    //set the zoom level for the map
-    this.setZoom = function(aZoom){
-    	myOptions.zoom = aZoom;
-    }
+	//set the zoom level for the map
+	this.setZoom = function(aZoom){
+		myOptions.zoom = aZoom;
+	}
 }
 
-var UserInterface = function(verticalCallback, horizontalCallback) {
+var UserInterface = function(vertical, horizontal) {
 
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
@@ -121,8 +148,8 @@ var UserInterface = function(verticalCallback, horizontalCallback) {
 	}
 
 	var handleIncrements = function(incrementX,
-								    incrementY,
-								    ratioX, ratioY) {
+									incrementY,
+									ratioX, ratioY) {
 
 		var resetX = false;
 		var resetY = false;
@@ -132,14 +159,14 @@ var UserInterface = function(verticalCallback, horizontalCallback) {
 			var inc = 1;
 			var dt = inc * (incrementY / Math.abs(incrementY));
 
-			verticalCallback(dt);
+			vertical(dt);
 
 			resetY = true;
 		}
 		if (Math.abs(incrementX) >= ratioX) {
 
-			if (incrementX > 0) { horizontalCallback(1) } 
-			else { horizontalCallback(-1) }
+			if (incrementX > 0) { horizontal(1) } 
+			else { horizontal(-1) }
 
 			resetX = true;
 		}
@@ -150,16 +177,16 @@ var UserInterface = function(verticalCallback, horizontalCallback) {
 	$(window).on('keydown', function(event) {
 		switch(event.keyCode) {
 			case 37:
-				horizontalCallback(-1);
+				horizontal(-1);
 				break;
 			case 38:
-				verticalCallback(1);
+				vertical(1);
 				break;
 			case 39:
-				horizontalCallback(1);
+				horizontal(1);
 				break;
 			case 40:
-				verticalCallback(-1);
+				vertical(-1);
 		}
 	}).on('mousewheel', function(event) {
 
@@ -196,9 +223,11 @@ var Game = function() {
 	var state = {
 		city: "Lorem Ipsum Dolor",
 		country: "Sit Amet",
-		temp: 52,
-		desc: ["One", "Two", "Three"],
-		descId: 1
+		temp: 0,
+		correctTemp: 0,
+		desc: [],
+		descID: 0,
+		correctDescID: 0
 	}
 
 	// Constrcut new user interface with callbacks for inherit events
@@ -209,43 +238,50 @@ var Game = function() {
 		else { lastDesc() }
 	});
 
-	var setCity = function(c) { city = c }
-	var setCountry = function(c) { country = c }
+	var updateUserInterfaceWithState = function() {
+		userInterface.setCity(state.city);
+		userInterface.setCountry(state.country);
+		userInterface.setTemperature(state.temp);
+		userInterface.setDescription(state.desc[state.descID]);
+		console.log(state);
+	}
+
 	var changeTemperature = function(dt) { 
 		state.temp += dt;
 		userInterface.setTemperature(state.temp);
 	}
 
 	var updateDesc = function(dir) {
-		if (state.descId >= state.desc.length) { state.descId = 0 }
-		else if (state.descId < 0) { state.descId = state.desc.length-1 }
+		if (state.descID >= state.desc.length) { state.descID = 0 }
+		else if (state.descID < 0) { state.descID = state.desc.length-1 }
 
-		var newDesc = state.desc[state.descId]
+		var newDesc = state.desc[state.descID]
 		userInterface.setDescription(newDesc, dir);
 	}
 
 	var nextDesc = function() {
-		state.descId += 1;
+		state.descID += 1;
 		updateDesc(userInterface.DIRECTION_RIGHT);
 	}
 	var lastDesc = function() {
-		state.descId -= 1;
+		state.descID -= 1;
 		updateDesc(userInterface.DIRECTION_LEFT);
 	}
-
-	/* Tester */
-	userInterface.setCity(state.city);
-	userInterface.setCountry(state.country);
-	userInterface.setTemperature(state.temp);
-	var newDesc = state.desc[state.descId];
-	userInterface.setDescription(newDesc);
 
 	var map = new Map("map");
 
 	var weather = new WeatherAPI();
+	weather.setTempLocale(weather.FARENHEIT);
 
-	weather.setRandCity(function() {
-		console.log(weather.getCityName());
+	weather.setCity(function() {
+		var weatherState = weather.getGameState()
+
+		state.city = weatherState.city;
+		state.country = weatherState.coord;
+		state.desc = weatherState.weatherStates;
+		state.correctDescID = weatherState.correctStateIndex;
+
+		updateUserInterfaceWithState();
 	});
 }
 

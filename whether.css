@@ -9,6 +9,7 @@ section#sidebar {
 	top: 0;
 	left: 0;
 	position: relative;
+	z-index: 2;
 	background: #FF4C4C;
 	padding: 30px;
 	max-width: 100%;
@@ -79,10 +80,13 @@ span.desc.left, span.desc.right {
 	opacity: 1;
 }
 
-#map {
+section#map {
 	position: absolute;
 	top: 0;
 	right: 0;
+	height: 100% !important;
+	width: calc(100% - 400px) !important;
+	z-index: 1;
 }
 
 @media screen and (max-height: 720px) {
