@@ -6,9 +6,9 @@ body, html {
 section#sidebar {
 	width: 400px;
 	height: 100%;
-	display: none;
 	top: 0;
 	left: 0;
+	position: relative;
 	background: #FF4C4C;
 	padding: 30px;
 	max-width: 100%;
@@ -77,6 +77,12 @@ span.desc.left { left: -40px; }
 span.desc.right { left: 40px; }
 span.desc.left, span.desc.right {
 	opacity: 1;
+}
+
+#map {
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 @media screen and (max-height: 720px) {

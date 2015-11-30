@@ -34,7 +34,6 @@ var WeatherAPI = function(){
 		//call API and store to fields
 		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + APPID, function(data){
 			weatherData = data;
-			console.log(weatherData);
 
 			//parse data from JSON
 			cityName = data.name;
@@ -52,36 +51,11 @@ var WeatherAPI = function(){
 		});
 	}
 
-	this.getCityName = function(){
-		//return string of city name
-		console.log(cityName);
-		return cityName;
-	}
-
-	this.getCoord = function(){
-		//return array with [latitude, longitude]
-		console.log(cityCoord);
-		return cityCoord;
-	}
-
-	this.getTempC = function(){
-		//return temperature in celsius (int)
-		console.log(tempC + " celsius");
-		return tempC;
-	}
-
-	this.getTempF = function(){
-		//return temperature in fahrenheit (int)
-		console.log(tempF + " fahrenheit");
-		return tempF;
-	}
-
-	this.getWeather = function(){
-		//return weather as a string
-		console.log(weatherState);
-		console.log(weatherStateString);
-		return weatherStateString;
-	}
+	this.getCityName = function(){ return cityName }
+	this.getCoord = function(){ return cityCoord }
+	this.getTempC = function(){ return tempC }
+	this.getTempF = function(){ return tempF }
+	this.getWeather = function(){ return weatherStateString }
 }
 
 var MapAPI = function() {
@@ -118,7 +92,7 @@ var MapAPI = function() {
     }
 }
 
-var UserInterface = function(game) {
+var UserInterface = function(verticalCallback, horizontalCallback) {
 
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
@@ -164,14 +138,14 @@ var UserInterface = function(game) {
 			var inc = 1;
 			var dt = inc * (incrementY / Math.abs(incrementY));
 
-			game.changeTemperature(dt);
+			verticalCallback(dt);
 
 			resetY = true;
 		}
 		if (Math.abs(incrementX) >= ratioX) {
 
-			if (incrementX > 0) { game.nextDesc() } 
-			else { game.lastDesc() }
+			if (incrementX > 0) { horizontalCallback(1) } 
+			else { horizontalCallback(-1) }
 
 			resetX = true;
 		}
@@ -182,16 +156,16 @@ var UserInterface = function(game) {
 	$(window).on('keydown', function(event) {
 		switch(event.keyCode) {
 			case 37:
-				game.lastDesc();
+				horizontalCallback(-1);
 				break;
 			case 38:
-				game.changeTemperature(1);
+				verticalCallback(1);
 				break;
 			case 39:
-				game.nextDesc();
+				horizontalCallback(1);
 				break;
 			case 40:
-				game.changeTemperature(-1);
+				verticalCallback(-1);
 		}
 	}).on('mousewheel', function(event) {
 
@@ -210,7 +184,7 @@ var UserInterface = function(game) {
 
 	element.sidebar.bind('move', function(event) {
 
-		dragIncrementX -= event.deltaX;
+		dragIncrementX += event.deltaX;
 		dragIncrementY -= event.deltaY;
 
 		var resetXY =
@@ -232,12 +206,19 @@ var Game = function() {
 		desc: ["One", "Two", "Three"],
 		descId: 1
 	}
-	
-	var	userInterface = new UserInterface(this);
+
+
+	// Constrcut new user interface with callbacks for inherit events
+	var	userInterface = new UserInterface(function(d) {
+		changeTemperature(d);
+	}, function(d) {
+		if (d > 0) { nextDesc() }
+		else { lastDesc() }
+	});
 
 	var setCity = function(c) { city = c }
 	var setCountry = function(c) { country = c }
-	this.changeTemperature = function(dt) { 
+	var changeTemperature = function(dt) { 
 		state.temp += dt;
 		userInterface.setTemperature(state.temp);
 	}
@@ -250,26 +231,24 @@ var Game = function() {
 		userInterface.setDescription(newDesc, dir);
 	}
 
-	this.nextDesc = function() {
+	var nextDesc = function() {
 		state.descId += 1;
 		updateDesc(userInterface.DIRECTION_RIGHT);
 	}
-	this.lastDesc = function() {
+	var lastDesc = function() {
 		state.descId -= 1;
 		updateDesc(userInterface.DIRECTION_LEFT);
 	}
 
-
+	/* Tester */
 	userInterface.setCity(state.city);
 	userInterface.setCountry(state.country);
 	userInterface.setTemperature(state.temp);
 	var newDesc = state.desc[state.descId];
 	userInterface.setDescription(newDesc);
-}
 
-$(document).ready(function() {
-<<<<<<< HEAD
-	var userInterface = new UserInterface();
+
+	/*
 	var weatherAPI = new WeatherAPI();
 	var mapAPI = new MapAPI();
 
@@ -287,9 +266,9 @@ $(document).ready(function() {
 		mapAPI.setCoord(weatherAPI.getCoord());
 		mapAPI.setMap();
 	}, 1000);
+	*/
+}
 
-=======
+$(document).ready(function() {
 	var whether = new Game();
-	console.log(whether);
->>>>>>> interface
 });
