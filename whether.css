@@ -9,6 +9,7 @@ section#sidebar {
 	top: 0;
 	left: 0;
 	position: relative;
+	overflow: hidden;
 	z-index: 2;
 	background: #FF4C4C;
 	padding: 30px;

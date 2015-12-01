@@ -18,7 +18,14 @@ var WeatherAPI = function(){
 	var weatherState;
 	var weatherStateString;
 
-	var gameState = {};
+	var gameState = {
+		city: "",
+		coord: "",
+		temp: 0,
+		weatherStates: [],
+		correctStateIndex: 0
+	};
+
 	var tempLocale = this.FARENHEIT;
 
 	var updateCityData = function(data) {
@@ -43,23 +50,23 @@ var WeatherAPI = function(){
 			case this.CELCIUS:
 				gameState.temp = Math.round(tempK - 273.15);
 				break;
+			default:
+				gameState.temp = Math.round(tempK);
+				break;
 		}
 
 		var keys = Object.keys(weatherStateList);
 
-		gameState.weatherStates = [];
-
-		for (var i = 0; i < STATE_OPTIONS; i++) {
-			gameState.weatherStates.push(
-				weatherStateList[keys[ keys.length * Math.random() << 0]]
-			);
+		for (var i = 0; i < STATE_OPTIONS-1; i++) {
+			var newState = weatherStateList[keys[ keys.length * Math.random() << 0]];
+			gameState.weatherStates.push(newState);
 		}
 
 		var randIndex = Math.floor(Math.random()*STATE_OPTIONS);
-		gameState.weatherStates = gameState.weatherStates
-										   .splice(randIndex, 0, weatherState)
-										   .join();
+		gameState.weatherStates.splice(randIndex, 0, weatherState);
 		gameState.correctStateIndex = randIndex;
+
+		console.log(gameState.weatherStates);
 	}
 
 	//set a new random city
@@ -72,11 +79,17 @@ var WeatherAPI = function(){
 				break;
 			}
 		}
+
+		// Must preserve context outside API call
+		var self = this;
+
 		//call API and store to fields
 		$.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + randCityID + "&APPID=" + keys.weather, function(data){
-			updateCityData(data);
-			generateGameState();
-			complete();
+
+			// Function calls default to "window" as their context, must specify self.
+			updateCityData.call(self, data);
+			generateGameState.call(self);
+			complete.call(self);
 		});
 	}
 	this.getGameState = function() { return gameState }
@@ -129,9 +142,7 @@ var UserInterface = function(vertical, horizontal) {
 		city: $("#sidebar h1"),
 		country: $("#sidebar h4"),
 		temp: $("#forcast .temp"),
-		desc: [$("#forcast .desc.one"),
-			   $("#forcast .desc.two")],
-		currentDesc: 0,
+		desc: $("#forcast .desc"),
 		icon: $("#forcast .icon")
 	}
 
@@ -144,7 +155,7 @@ var UserInterface = function(vertical, horizontal) {
 	this.setCountry = function(c) { element.country.text(c) }
 	this.setTemperature = function(t) { element.temp.text(t) }
 	this.setDescription = function(d, dir) {
-		element.desc[element.currentDesc].text(d);
+		element.desc.text(d);
 	}
 
 	var handleIncrements = function(incrementX,
@@ -194,10 +205,11 @@ var UserInterface = function(vertical, horizontal) {
 		scrollIncrementY -= event.deltaY;
 
 		var resetXY =
-		handleIncrements(scrollIncrementX,
-						 scrollIncrementY,
-						 SCROLL_DESC_RATIO,
-						 SCROLL_TEMP_RATIO);
+		handleIncrements.call(this, 
+						      scrollIncrementX,
+						 	  scrollIncrementY,
+						 	  SCROLL_DESC_RATIO,
+						 	  SCROLL_TEMP_RATIO);
 
 		if (resetXY[0]) { scrollIncrementX = 0 }
 		if (resetXY[1]) { scrollIncrementY = 0 }
@@ -209,10 +221,11 @@ var UserInterface = function(vertical, horizontal) {
 		dragIncrementY -= event.deltaY;
 
 		var resetXY =
-		handleIncrements(dragIncrementX,
-						 dragIncrementY,
-						 DRAG_DESC_RATIO,
-						 DRAG_TEMP_RATIO);
+		handleIncrements.call(this, 
+						      dragIncrementX,
+						 	  dragIncrementY,
+						 	  DRAG_DESC_RATIO,
+						 	  DRAG_TEMP_RATIO);
 
 		if (resetXY[0]) { dragIncrementX = 0 }
 		if (resetXY[1]) { dragIncrementY = 0 }
@@ -261,11 +274,11 @@ var Game = function() {
 
 	var nextDesc = function() {
 		state.descID += 1;
-		updateDesc(userInterface.DIRECTION_RIGHT);
+		updateDesc.call(this, userInterface.DIRECTION_RIGHT);
 	}
 	var lastDesc = function() {
 		state.descID -= 1;
-		updateDesc(userInterface.DIRECTION_LEFT);
+		updateDesc.call(this, userInterface.DIRECTION_LEFT);
 	}
 
 	var map = new Map("map");
@@ -281,7 +294,7 @@ var Game = function() {
 		state.desc = weatherState.weatherStates;
 		state.correctDescID = weatherState.correctStateIndex;
 
-		updateUserInterfaceWithState();
+		updateUserInterfaceWithState.call(this);
 	});
 }
 
