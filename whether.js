@@ -215,7 +215,7 @@ var UserInterface = function() {
 	});
 }
 
-var MakeRoundAction = function(game, userInterface, map, weather) {
+var MakeRoundAction = function(userInterface, map, weather) {
 
 	var WEATHER_STATE_OPTIONS = 5;
 
@@ -311,8 +311,16 @@ var MakeRoundAction = function(game, userInterface, map, weather) {
 	var updateMap = function() { map.setCoord(coord) }
 }
 
-var ScoreRoundAction = function(game, interface) {
+var ScoreRoundAction = function(interface) {
 	// TODO: Make sure Celcius and Farenheit are scored differently
+
+	this.setCorrectTemp = function() {
+
+	}
+
+	this.setCorrectStateIndex = function() {
+
+	}
 }
 
 var ScoreGameAction = function(game) {
@@ -321,23 +329,23 @@ var ScoreGameAction = function(game) {
 
 var Game = function() {
 
-	var round = {
-		temp: 0,
-		stateIndex: 0
-	}
-
 	var userInterface = new UserInterface();
 	var map = new Map("map");
 	var weather = new Weather();
 
-	var makeRound = new MakeRoundAction(this, userInterface, map, weather);
+	var makeRound = new MakeRoundAction(userInterface, map, weather);
+	var scoreRound = new ScoreRoundAction(userInterface);
 
 	makeRound.setTempLocale(makeRound.FARENHEIT);
 
 	makeRound.execute(function(correctTemp, correctStateIndex) {
-		round.temp = correctTemp;
-		round.stateIndex = correctStateIndex;
+
+		scoreRound.setCorrectTemp(correctTemp);
+		scoreRound.setCorrectStateIndex(setCorrectStateIndex);
+
 	});
+
+	// TODO: Add callback from userInterface when throw is played
 }
 
 $(document).ready(function() {
