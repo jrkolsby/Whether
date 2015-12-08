@@ -126,10 +126,12 @@ var UserInterface = function() {
 	}
 
 	this.getWeatherStateIndex = function() { return weatherStateIndex }
-	this.getTemperature = function() { return temperature }
+	this.getTemperature = function() { return temp }
 
 	this.setSubmitCallback = function(callback) {
-
+		element.sidebar.click(function() {
+			callback();
+		});
 	}
 
 	var changeTemperature = function(dt) {
@@ -373,7 +375,9 @@ var ScoreRoundAction = function(userInterface) {
 			diff = Math.abs(correctTemp - temp);
 		}
 
-		score = (MAXIMUM_DIFFERENCE-diff)*STATE_MULTIPLIER;
+		score = (MAXIMUM_DIFFERENCE-diff);
+
+		if (stateIndex == correctStateIndex) { score *= STATE_MULTIPLIER }
 		if (score < 0) { score = 0 }
 
 		complete(score);
@@ -405,7 +409,7 @@ var Game = function() {
 	});
 
 	userInterface.setSubmitCallback(function() {
-		ScoreRoundAction.execute(function() {
+		scoreRound.execute(function(score) {
 			console.log(score + " pts!");
 		});
 	})
