@@ -52,7 +52,7 @@ div#forcast {
 	-webkit-transform: translate(-50%,-50%);
 }
 span.temp,
-span.desc {
+span.state {
 	display: block;
 	color: #fff;
 	text-align: center;
@@ -63,21 +63,22 @@ span.temp {
 	font-weight: 400;
 	font-size: 7em;
 }
-span.desc {
+span.state {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	font-weight: 400;
 	font-size: 1.7em;
+	text-transform: capitalize;
 }
-span.desc.animate {
+span.state.animate {
 	transition: 2s left ease-in-out, 2s opacity ease-in-out;
 	-o-transition: 2s left ease-in-out, 2s opacity ease-in-out;
 	-moz-transition: 2s left ease-in-out, 2s opacity ease-in-out;
 	-webkit-transition: 2s left ease-in-out, 2s opacity ease-in-out;
 }
 
-span.desc.left { left: -40px; }
-span.desc.right { left: 40px; }
-span.desc.left, span.desc.right {
+span.state.left { left: -40px; }
+span.state.right { left: 40px; }
+span.state.left, span.state.right {
 	opacity: 1;
 }
 
