@@ -233,9 +233,9 @@ var UserInterface = function() {
 
 var MakeRoundAction = function(userInterface, map, weather) {
 
-	var WEATHER_STATE_OPTIONS = 5,
-		MINIMUM_TEMP_K = 210,
-		MAXIMUM_TEMP_K = 330;
+	var WEATHER_STATE_OPTIONS = 3,
+		MINIMUM_TEMP_K = 300,
+		MAXIMUM_TEMP_K = 300;
 
 	var city = "",
 		coord = {},
@@ -324,7 +324,9 @@ var MakeRoundAction = function(userInterface, map, weather) {
 
 		for (var i = 0; i < WEATHER_STATE_OPTIONS-1; i++) {
 			var newState = weatherStateList[keys[ keys.length * Math.random() << 0]];
+
 			// TODO: verify that newState isn't weatherStateString or in gameState.weatherStates.
+
 			weatherStates.push(newState);
 		}
 
@@ -345,7 +347,6 @@ var MakeRoundAction = function(userInterface, map, weather) {
 }
 
 var ScoreRoundAction = function(userInterface) {
-	// TODO: Make sure Celcius and Farenheit are scored differently
 
 	var MAXIMUM_DIFFERENCE = 100,
 		STATE_MULTIPLIER = 3;
@@ -380,6 +381,8 @@ var ScoreRoundAction = function(userInterface) {
 		if (stateIndex == correctStateIndex) { score *= STATE_MULTIPLIER }
 		if (score < 0) { score = 0 }
 
+		score = Math.floor(score);
+
 		complete(score);
 	}
 }
@@ -410,7 +413,7 @@ var Game = function() {
 
 	userInterface.setSubmitCallback(function() {
 		scoreRound.execute(function(score) {
-			console.log(score + " pts!");
+			alert(score + " pts!");
 		});
 	})
 
