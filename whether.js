@@ -143,6 +143,8 @@ var UserInterface = function() {
 
 	// TODO: Slide between DOM elements for each State
 
+	// TODO: Fix fencepost error!
+
 	var nextWeatherState = function() {
 		if (weatherStateIndex+1 < weatherStates.length) { weatherStateIndex += 1 }
 		else { weatherStateIndex = 0 }
@@ -382,12 +384,8 @@ var ScoreRoundAction = function(userInterface) {
 
 		if (diff <= MAXIMUM_DIFFERENCE){
 			score = Math.round(Math.pow( ( (MAXIMUM_DIFFERENCE - diff) / MAXIMUM_DIFFERENCE ), SCORE_EXPONENT ) * SCORE_MAXIMUM);
-			//score = (MAXIMUM_DIFFERENCE-diff);
-			console.log("diff: " + diff);
-			console.log("score: " + score);
-		} else {
-			score = 0;
-		}
+		} 
+		else { score = 0 }
 
 		if (stateIndex == correctStateIndex) { score *= STATE_MULTIPLIER }
 
