@@ -1,3 +1,6 @@
+var FARENHEIT = 0,
+	CELCIUS = 1;
+
 var Weather = function(){
 
 	var cityName = "",
@@ -41,6 +44,8 @@ var Weather = function(){
 
 var Map = function(mapID) {
 
+	// TODO: Integrate GeoCoder API to get country name from coords
+
 	var myOptions = {
 
 		 zoom: 5,
@@ -75,9 +80,7 @@ var Map = function(mapID) {
 
 var UserInterface = function() {
 
-	var temp = 0,
-		weatherStates = [],
-		weatherStateIndex = 0;
+	//TODO: Put bottom / top limits on temperature
 
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
@@ -85,21 +88,28 @@ var UserInterface = function() {
 	var DRAG_TEMP_RATIO = 25,
 		DRAG_DESC_RATIO = 50;
 
-	var element = {
-		sidebar: 	   $("#sidebar"),
-		city: 		   $("#sidebar h1"),
-		country: 	   $("#sidebar h4"),
-		temp: 		   $("#forcast .temp"),
-		weatherStates: $("#forcast .weatherStates"),
-		icon: 		   $("#forcast .icon")
-	}
-
 	var scrollIncrementY = 0,
 		scrollIncrementX = 0,
 		dragIncrementY = 0,
 		dragIncrementX = 0;
 
-	this.setCity = function(c) { element.city.text(c) }
+	var temp = 0,
+		weatherStates = [],
+		weatherStateIndex = 0;
+
+	var element = {
+		sidebar: 	   $("#sidebar"),
+		city: 		   $("#sidebar h1"),
+		country: 	   $("#sidebar h4"),
+		temp: 		   $("#forcast .temp"),
+		state: 	  	   $("#forcast .state"),
+		icon: 		   $("#forcast .icon")
+	}
+
+	this.setCity = function(c) {
+		// TODO: Add linebreaks to long names
+		element.city.text(c)
+	}
 	this.setCountry = function(c) { element.country.text(c) }
 
 	this.setWeatherState = function(a) {
@@ -114,29 +124,39 @@ var UserInterface = function() {
 
 	this.setWeatherStateIndex = function(a) {
 		weatherStateIndex = a;
-		element.weatherStates.text(weatherStates[weatherStateIndex]);
+		element.state.text(weatherStates[weatherStateIndex]);
 	}
 
+	this.getWeatherStateIndex = function() { return weatherStateIndex }
+	this.getTemperature = function() { return temp }
+
+	this.setSubmitCallback = function(callback) {
+		element.sidebar.click(function() {
+			callback();
+		});
+	}
 
 	var changeTemperature = function(dt) {
 		temp += dt;
-		element.temp.text(temp)
+		element.temp.text(temp);
 	}
 
 	// TODO: Slide between DOM elements for each State
+
+	// TODO: Fix fencepost error!
 
 	var nextWeatherState = function() {
 		if (weatherStateIndex+1 < weatherStates.length) { weatherStateIndex += 1 }
 		else { weatherStateIndex = 0 }
 
-		element.weatherStates.text(weatherStates[weatherStateIndex]);
+		element.state.text(weatherStates[weatherStateIndex]);
 	}
 
 	var lastWeatherState = function() {
 		if (weatherStateIndex-1 > 0) { weatherStateIndex -= 1 }
 		else { weatherStateIndex = weatherStates.length }
 
-		element.weatherStates.text(weatherStates[weatherStateIndex]);
+		element.state.text(weatherStates[weatherStateIndex]);
 	}
 
 	var handleIncrements = function(incrementX,
@@ -172,13 +192,13 @@ var UserInterface = function() {
 				lastWeatherState();
 				break;
 			case 38:
-				changeTemperature(1)
+				changeTemperature(1);
 				break;
 			case 39:
 				nextWeatherState();
 				break;
 			case 40:
-				changeTemperature(-1)
+				changeTemperature(-1);
 		}
 	}).on('mousewheel', function(event) {
 
@@ -215,21 +235,21 @@ var UserInterface = function() {
 	});
 }
 
-var MakeRoundAction = function(game, userInterface, map, weather) {
+var MakeRoundAction = function(userInterface, map, weather) {
 
-	var WEATHER_STATE_OPTIONS = 5;
+	var WEATHER_STATE_OPTIONS = 3,
+		MINIMUM_TEMP_K = 300,
+		MAXIMUM_TEMP_K = 300;
 
 	var city = "",
 		coord = {},
 		coordString = "",
 		temp = 0,
+		initialTemp = 0,
 		weatherStates = [],
 		correctStateIndex = 0;
-	
-	this.FARENHEIT = 0;
-	this.CELCIUS = 1;
 
-	this.setTempLocale = function(i) { tempLocale = i }
+	this.setLocale = function(i) { locale = i }
 
 	this.execute = function(complete) {
 
@@ -266,34 +286,51 @@ var MakeRoundAction = function(game, userInterface, map, weather) {
 		return randomCityID;
 	}
 
+	var convertTemperature = function(t1) {
+		var t2 = 0;
+		switch(locale) {
+			case FARENHEIT:
+				t2 = Math.round(1.8*(t1-273.15)+32);
+				break;
+			case CELCIUS:
+				t2 = Math.round(t1 - 273.15);
+				break;
+			default:
+				t2 = Math.round(t1);
+				break;
+		}
+		return t2;
+	}
+
+	var getRandomTemp = function() {
+
+		var r = Math.random();
+		var t = Math.floor(r * (MAXIMUM_TEMP_K-MINIMUM_TEMP_K)) + MINIMUM_TEMP_K;
+
+		return convertTemperature.call(this,t);
+	}
+
 	var makeStates = function() {
 
-		var tempK = weather.getTemp();
-		var cityName = weather.getCityName();
-		var coordObj = weather.getCityCoord();
-		var weatherState = weather.getWeatherState();
+		var tempK = weather.getTemp(),
+			cityName = weather.getCityName(),
+			coordObj = weather.getCityCoord(),
+			weatherState = weather.getWeatherState();
 
 		city = cityName;
 		coord = coordObj;
 		coordString = coordObj.lat + ", " + coordObj.lng;
 
-		switch(tempLocale) {
-			case this.FARENHEIT:
-				temp = Math.round(1.8*(tempK - 273.15)+32);
-				break;
-			case this.CELCIUS:
-				temp = Math.round(tempK - 273.15);
-				break;
-			default:
-				temp = Math.round(tempK);
-				break;
-		}
+		temp = convertTemperature.call(this, tempK);
+		initialTemp = getRandomTemp.call(this);
 
 		var keys = Object.keys(weatherStateList);
 
 		for (var i = 0; i < WEATHER_STATE_OPTIONS-1; i++) {
 			var newState = weatherStateList[keys[ keys.length * Math.random() << 0]];
+
 			// TODO: verify that newState isn't weatherStateString or in gameState.weatherStates.
+
 			weatherStates.push(newState);
 		}
 
@@ -306,13 +343,56 @@ var MakeRoundAction = function(game, userInterface, map, weather) {
 		userInterface.setCity(city);
 		userInterface.setCountry(coordString);
 		userInterface.setWeatherState(weatherStates);
+		userInterface.setTemperature(initialTemp);
+		userInterface.setWeatherStateIndex(0);
 	}
 
 	var updateMap = function() { map.setCoord(coord) }
 }
 
-var ScoreRoundAction = function(game, interface) {
-	// TODO: Make sure Celcius and Farenheit are scored differently
+var ScoreRoundAction = function(userInterface) {
+
+	var MAXIMUM_DIFFERENCE = 40,
+		STATE_MULTIPLIER = 2,
+		SCORE_EXPONENT = 3.5,
+		SCORE_MAXIMUM = 100;
+
+	var correctTemp = 0;
+	var correctStateIndex = 0;
+
+	var locale;
+
+	var score = 0;
+
+	this.setCorrectTemp = function(t) { correctTemp = t }
+	this.setCorrectStateIndex = function(i) { correctStateIndex = i }
+	this.setLocale = function(l) { locale = l }
+
+	this.getScore = function() { return score }
+
+	this.execute = function(complete) {
+		var temp = userInterface.getTemperature();
+		var stateIndex = userInterface.getWeatherStateIndex();
+
+		var diff = 0;
+
+		if (locale == FARENHEIT) {
+			diff = Math.abs(correctTemp*(5/9) - temp*(5/9));
+		} else {
+			diff = Math.abs(correctTemp - temp);
+		}
+
+		if (diff <= MAXIMUM_DIFFERENCE){
+			score = Math.round(Math.pow( ( (MAXIMUM_DIFFERENCE - diff) / MAXIMUM_DIFFERENCE ), SCORE_EXPONENT ) * SCORE_MAXIMUM);
+		} 
+		else { score = 0 }
+
+		if (stateIndex == correctStateIndex) { score *= STATE_MULTIPLIER }
+
+		score = Math.floor(score);
+
+		complete(score);
+	}
 }
 
 var ScoreGameAction = function(game) {
@@ -321,23 +401,31 @@ var ScoreGameAction = function(game) {
 
 var Game = function() {
 
-	var round = {
-		temp: 0,
-		stateIndex: 0
-	}
-
 	var userInterface = new UserInterface();
 	var map = new Map("map");
 	var weather = new Weather();
 
-	var makeRound = new MakeRoundAction(this, userInterface, map, weather);
+	var locale = FARENHEIT;
 
-	makeRound.setTempLocale(makeRound.FARENHEIT);
+	var makeRound = new MakeRoundAction(userInterface, map, weather);
+	var scoreRound = new ScoreRoundAction(userInterface);
+
+	makeRound.setLocale(locale);
 
 	makeRound.execute(function(correctTemp, correctStateIndex) {
-		round.temp = correctTemp;
-		round.stateIndex = correctStateIndex;
+
+		scoreRound.setCorrectTemp(correctTemp);
+		scoreRound.setCorrectStateIndex(correctStateIndex);
+		scoreRound.setLocale(locale);
 	});
+
+	userInterface.setSubmitCallback(function() {
+		scoreRound.execute(function(score) {
+			console.log(score + " pts!");
+		});
+	})
+
+	// TODO: Add callback from userInterface when throw is played
 }
 
 $(document).ready(function() {
