@@ -88,6 +88,9 @@ var UserInterface = function() {
 	var DRAG_TEMP_RATIO = 25,
 		DRAG_DESC_RATIO = 50;
 
+	var MIN_TEMPERATURE = -256,
+		MAX_TEMPERATURE = 256;
+
 	var scrollIncrementY = 0,
 		scrollIncrementX = 0,
 		dragIncrementY = 0,
@@ -137,24 +140,27 @@ var UserInterface = function() {
 	}
 
 	var changeTemperature = function(dt) {
+
 		temp += dt;
+
+		if (temp >= MAX_TEMPERATURE) { temp = MIN_TEMPERATURE + (temp - MAX_TEMPERATURE) }
+		if (temp <= MIN_TEMPERATURE) { temp = MAX_TEMPERATURE - (MIN_TEMPERATURE - temp) }
+
 		element.temp.text(temp);
 	}
 
 	// TODO: Slide between DOM elements for each State
 
-	// TODO: Fix fencepost error!
-
 	var nextWeatherState = function() {
-		if (weatherStateIndex+1 < weatherStates.length) { weatherStateIndex += 1 }
-		else { weatherStateIndex = 0 }
+		if (weatherStateIndex >= weatherStates.length-1) { weatherStateIndex = 0 }
+		else { weatherStateIndex += 1 }
 
 		element.state.text(weatherStates[weatherStateIndex]);
 	}
 
 	var lastWeatherState = function() {
-		if (weatherStateIndex-1 > 0) { weatherStateIndex -= 1 }
-		else { weatherStateIndex = weatherStates.length }
+		if (weatherStateIndex <= 0) { weatherStateIndex = weatherStates.length-1 }
+		else { weatherStateIndex -= 1 }
 
 		element.state.text(weatherStates[weatherStateIndex]);
 	}
@@ -329,9 +335,12 @@ var MakeRoundAction = function(userInterface, map, weather) {
 		for (var i = 0; i < WEATHER_STATE_OPTIONS-1; i++) {
 			var newState = weatherStateList[keys[ keys.length * Math.random() << 0]];
 
-			// TODO: verify that newState isn't weatherStateString or in gameState.weatherStates.
-
-			weatherStates.push(newState);
+			if (weatherStates.indexOf(newState) >= 0 ||
+				newState == weatherState) {
+				i -= 1;
+			} else {
+				weatherStates.push(newState);
+			}
 		}
 
 		var randIndex = Math.floor(Math.random()*WEATHER_STATE_OPTIONS);
@@ -423,9 +432,7 @@ var Game = function() {
 		scoreRound.execute(function(score) {
 			console.log(score + " pts!");
 		});
-	})
-
-	// TODO: Add callback from userInterface when throw is played
+	});
 }
 
 $(document).ready(function() {
