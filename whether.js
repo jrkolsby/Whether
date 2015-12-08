@@ -80,6 +80,8 @@ var Map = function(mapID) {
 
 var UserInterface = function() {
 
+	//TODO: Put bottom / top limits on temperature
+
 	var SCROLL_TEMP_RATIO = 50,
 		SCROLL_DESC_RATIO = 100;
 
@@ -348,8 +350,10 @@ var MakeRoundAction = function(userInterface, map, weather) {
 
 var ScoreRoundAction = function(userInterface) {
 
-	var MAXIMUM_DIFFERENCE = 100,
-		STATE_MULTIPLIER = 3;
+	var MAXIMUM_DIFFERENCE = 40,
+		STATE_MULTIPLIER = 2,
+		SCORE_EXPONENT = 3.5,
+		SCORE_MAXIMUM = 100;
 
 	var correctTemp = 0;
 	var correctStateIndex = 0;
@@ -376,10 +380,16 @@ var ScoreRoundAction = function(userInterface) {
 			diff = Math.abs(correctTemp - temp);
 		}
 
-		score = (MAXIMUM_DIFFERENCE-diff);
+		if (diff <= MAXIMUM_DIFFERENCE){
+			score = Math.round(Math.pow( ( (MAXIMUM_DIFFERENCE - diff) / MAXIMUM_DIFFERENCE ), SCORE_EXPONENT ) * SCORE_MAXIMUM);
+			//score = (MAXIMUM_DIFFERENCE-diff);
+			console.log("diff: " + diff);
+			console.log("score: " + score);
+		} else {
+			score = 0;
+		}
 
 		if (stateIndex == correctStateIndex) { score *= STATE_MULTIPLIER }
-		if (score < 0) { score = 0 }
 
 		score = Math.floor(score);
 
@@ -413,7 +423,7 @@ var Game = function() {
 
 	userInterface.setSubmitCallback(function() {
 		scoreRound.execute(function(score) {
-			alert(score + " pts!");
+			console.log(score + " pts!");
 		});
 	})
 
