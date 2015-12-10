@@ -105,19 +105,25 @@ var UserInterface = function() {
 		city: 		   $("#sidebar h1"),
 		country: 	   $("#sidebar h4"),
 		temp: 		   $("#forcast .temp"),
-		state: 	  	   $("#forcast .state"),
+		stateParent:   $("#forcast .state"),
+		stateChild:    "<span></span>",
 		icon: 		   $("#forcast .icon")
 	}
 
 	this.setCity = function(c) {
 		// TODO: Add linebreaks to long names
-		element.city.text(c)
+		element.city.text(c);
 	}
 	this.setCountry = function(c) { element.country.text(c) }
 
 	this.setWeatherState = function(a) {
 		weatherStates = a;
 		// TODO: Create elements for each description
+		element.stateParent.children(element.stateElement).remove();
+		for (var i = 0; i < weatherStates.length; i++) {
+			$(element.stateChild).appendTo(element.stateParent)
+								 .text(weatherStates[i]);
+		}
 	}
 
 	this.setTemperature = function(t) {
@@ -127,7 +133,7 @@ var UserInterface = function() {
 
 	this.setWeatherStateIndex = function(a) {
 		weatherStateIndex = a;
-		element.state.text(weatherStates[weatherStateIndex]);
+		//element.state.text(weatherStates[weatherStateIndex]);
 	}
 
 	this.getWeatherStateIndex = function() { return weatherStateIndex }

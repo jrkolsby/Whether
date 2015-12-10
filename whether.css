@@ -44,6 +44,7 @@ h4 {
 }
 div#forcast {
 	position: absolute;
+	width: 100%;
 	top: 50%;
 	left: 50%;
 	padding: 40px;
@@ -57,6 +58,7 @@ span.state {
 	color: #fff;
 	text-align: center;
 	position: relative;
+	width: 100%;
 }
 span.temp {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
@@ -67,20 +69,15 @@ span.state {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	font-weight: 400;
 	font-size: 1.7em;
+}
+span.state span {
 	text-transform: capitalize;
+	position: absolute;
+	display: block;
+	width: 100%;
+	text-align: center;
 }
-span.state.animate {
-	transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-o-transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-moz-transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-webkit-transition: 2s left ease-in-out, 2s opacity ease-in-out;
-}
-
-span.state.left { left: -40px; }
-span.state.right { left: 40px; }
-span.state.left, span.state.right {
-	opacity: 1;
-}
+span.state span.left { left: -80px }
 
 section#map {
 	position: absolute;
