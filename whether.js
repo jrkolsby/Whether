@@ -143,6 +143,7 @@ var UserInterface = function() {
 
     this.setContinueCallback = function(t, callback) {
         element.button.text(t)
+                      .unbind("click")
                       .click(function() { callback() });
     }
     this.setRound = function(i, j) { element.round.text(i + "/" + j) }
