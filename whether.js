@@ -378,6 +378,7 @@ var ScoreRoundAction = function(userInterface) {
 	this.setLocale = function(l) { locale = l }
 
 	this.getScore = function() { return score }
+	this.getMaxScore = function() { return SCORE_MAXIMUM * STATE_MULTIPLIER}
 
 	this.execute = function(complete) {
 		var temp = userInterface.getTemperature();
@@ -418,6 +419,8 @@ var Game = function() {
 
 	var makeRound = new MakeRoundAction(userInterface, map, weather);
 	var scoreRound = new ScoreRoundAction(userInterface);
+
+	var scoreMax = scoreRound.getMaxScore();
 
 	makeRound.setLocale(locale);
 
