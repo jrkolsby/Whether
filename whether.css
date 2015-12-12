@@ -76,8 +76,19 @@ span.state span {
 	display: block;
 	width: 100%;
 	text-align: center;
+
+	left: 0;
+	opacity: 0;
+
+	transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-o-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-moz-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-webkit-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
 }
-span.state span.left { left: -80px }
+
+span.state span.l { left: -40px }
+span.state span.r { left: 40px }
+span.state span.m { opacity: 1 }
 
 section#map {
 	position: absolute;

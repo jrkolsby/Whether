@@ -110,6 +110,10 @@ var UserInterface = function() {
 		icon: 		   $("#forcast .icon")
 	}
 
+	var	MIDDLE_STATE_CLASS = "m",
+		RIGHT_STATE_CLASS = "r",
+		LEFT_STATE_CLASS = "l";
+
 	this.setCity = function(c) {
 		// TODO: Add linebreaks to long names
 		element.city.text(c);
@@ -118,22 +122,19 @@ var UserInterface = function() {
 
 	this.setWeatherState = function(a) {
 		weatherStates = a;
-		// TODO: Create elements for each description
-		element.stateParent.children(element.stateElement).remove();
+		weatherStateIndex = 0;
+
+		element.stateParent.children().remove();
 		for (var i = 0; i < weatherStates.length; i++) {
 			$(element.stateChild).appendTo(element.stateParent)
 								 .text(weatherStates[i]);
 		}
+		updateWeatherState();
 	}
 
 	this.setTemperature = function(t) {
 		temp = t;
 		element.temp.text(t);
-	}
-
-	this.setWeatherStateIndex = function(a) {
-		weatherStateIndex = a;
-		//element.state.text(weatherStates[weatherStateIndex]);
 	}
 
 	this.getWeatherStateIndex = function() { return weatherStateIndex }
@@ -155,20 +156,36 @@ var UserInterface = function() {
 		element.temp.text(temp);
 	}
 
-	// TODO: Slide between DOM elements for each State
+	var updateWeatherState = function() {
+		element.stateParent.children().removeClass(LEFT_STATE_CLASS)
+									  .removeClass(RIGHT_STATE_CLASS)
+									  .removeClass(MIDDLE_STATE_CLASS);
+
+		var lastIndex;
+		if (weatherStateIndex >= weatherStates.length-1) { lastIndex = 0 }
+		else { lastIndex = weatherStateIndex + 1 }
+
+		var nextIndex;
+		if (weatherStateIndex <= 0) { nextIndex = weatherStates.length-1 }
+		else { nextIndex = weatherStateIndex - 1 }
+
+		$(element.stateParent.children()[weatherStateIndex]).addClass(MIDDLE_STATE_CLASS);
+		$(element.stateParent.children()[nextIndex]).addClass(RIGHT_STATE_CLASS);
+		$(element.stateParent.children()[lastIndex]).addClass(LEFT_STATE_CLASS);
+	}
 
 	var nextWeatherState = function() {
 		if (weatherStateIndex >= weatherStates.length-1) { weatherStateIndex = 0 }
 		else { weatherStateIndex += 1 }
 
-		element.state.text(weatherStates[weatherStateIndex]);
+		updateWeatherState();
 	}
 
 	var lastWeatherState = function() {
 		if (weatherStateIndex <= 0) { weatherStateIndex = weatherStates.length-1 }
 		else { weatherStateIndex -= 1 }
 
-		element.state.text(weatherStates[weatherStateIndex]);
+		updateWeatherState();
 	}
 
 	var handleIncrements = function(incrementX,
@@ -249,7 +266,7 @@ var UserInterface = function() {
 
 var MakeRoundAction = function(userInterface, map, weather) {
 
-	var WEATHER_STATE_OPTIONS = 3,
+	var WEATHER_STATE_OPTIONS = 10,
 		MINIMUM_TEMP_K = 300,
 		MAXIMUM_TEMP_K = 300;
 
@@ -359,7 +376,6 @@ var MakeRoundAction = function(userInterface, map, weather) {
 		userInterface.setCountry(coordString);
 		userInterface.setWeatherState(weatherStates);
 		userInterface.setTemperature(initialTemp);
-		userInterface.setWeatherStateIndex(0);
 	}
 
 	var updateMap = function() { map.setCoord(coord) }
