@@ -44,6 +44,7 @@ h4 {
 }
 div#forcast {
 	position: absolute;
+	width: 100%;
 	top: 50%;
 	left: 50%;
 	padding: 40px;
@@ -57,6 +58,7 @@ span.state {
 	color: #fff;
 	text-align: center;
 	position: relative;
+	width: 100%;
 }
 span.temp {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
@@ -67,19 +69,79 @@ span.state {
 	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
 	font-weight: 400;
 	font-size: 1.7em;
-	text-transform: capitalize;
 }
-span.state.animate {
-	transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-o-transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-moz-transition: 2s left ease-in-out, 2s opacity ease-in-out;
-	-webkit-transition: 2s left ease-in-out, 2s opacity ease-in-out;
+span.state span {
+	text-transform: capitalize;
+	position: absolute;
+	display: block;
+	width: 100%;
+	text-align: center;
+
+	left: 0;
+	opacity: 0;
+
+	transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-o-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-moz-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
+	-webkit-transition: 0.1s left ease-in-out, 0.1s opacity ease-in-out;
 }
 
-span.state.left { left: -40px; }
-span.state.right { left: 40px; }
-span.state.left, span.state.right {
-	opacity: 1;
+span.state span.l { left: -40px }
+span.state span.r { left: 40px }
+span.state span.m { opacity: 1 }
+
+div#board {
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	background: #fff;
+	padding: 30px;
+	text-align: center;
+}
+
+button#guess {
+	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+	font-weight: 700;
+	font-size: 1.7em;
+	text-transform: uppercase;
+	cursor: pointer;
+
+	margin: 0 auto;
+	display: inline-block;
+	height: 70px;
+	width: 100%;
+	background: #fff;
+	color: #000;
+	border: none;
+
+	box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.25);
+	border-radius: 14px;
+}
+button#guess:active {
+	box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.25);
+}
+h2#score,
+h2#round {
+	display: inline-block;
+	vertical-align:top;
+	font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+	font-weight: 700;
+	font-size: 2em;
+	margin-bottom: 20px;
+}
+h2#score { margin-right: 20px }
+h2#round { margin-left: 20px }
+
+h2#score::before { content: 'SCORE' }
+h2#round::before { content: 'ROUND' }
+
+h2#score::before,
+h2#round::before {
+	display: block;
+	opacity: 0.7;
+	font-size: 0.5em;
+	margin-bottom: 10px;
 }
 
 section#map {
@@ -90,6 +152,8 @@ section#map {
 	width: calc(100% - 400px) !important;
 	z-index: 1;
 }
+
+/* TODO: Responsive Styles & Layouts */
 
 @media screen and (max-height: 720px) {
 	div#forcast {
