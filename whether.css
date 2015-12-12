@@ -70,6 +70,7 @@ span.state {
 	font-weight: 400;
 	font-size: 1.7em;
 }
+
 span.state span {
 	text-transform: capitalize;
 	position: absolute;
