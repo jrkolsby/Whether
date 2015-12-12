@@ -106,7 +106,7 @@ var UserInterface = function() {
         stateParent:   $("#forcast .state"),
         stateChild:    "<span></span>",
         icon:          $("#forcast .icon"),
-        guessButton:   $("button#guess"),
+        button:        $("div#board button"),
         score:         $("h2#score"),
         round:         $("h2#round")
     }
@@ -141,10 +141,9 @@ var UserInterface = function() {
     this.getWeatherStateIndex = function() { return weatherStateIndex }
     this.getTemperature = function() { return temp }
 
-    this.setGuessCallback = function(callback) {
-        element.guessButton.click(function() {
-            callback();
-        });
+    this.setContinueCallback = function(t, callback) {
+        element.button.text(t)
+                      .click(function() { callback() });
     }
     this.setRound = function(i, j) { element.round.text(i + "/" + j) }
     this.setScore = function(i) { element.score.text(i) }
@@ -429,38 +428,58 @@ var ScoreRoundAction = function(userInterface) {
     }
 }
 
-var ScoreGameAction = function(game) {
+var ScoreGameAction = function(userInterface, scoreMax) {
+    var TOTAL_ROUNDS = 10;
 
+    var score = 0,
+        round = 0,
+        scoreMax = scoreMax;
+
+    this.execute = function(s) {
+        score += s;
+        round += 1;
+        userInterface.setScore(score, scoreMax);
+        userInterface.setRound(round, TOTAL_ROUNDS);
+    }
+    this.getScore = function() { return score }
+    this.getRound = function() { return round }
+    this.getShouldContinue = function() { return round < TOTAL_ROUNDS }
 }
 
 var Game = function() {
+
+    var locale = FARENHEIT;
 
     var userInterface = new UserInterface();
     var map = new Map("map");
     var weather = new Weather();
 
-    var locale = FARENHEIT;
-
     var makeRound = new MakeRoundAction(userInterface, map, weather);
     var scoreRound = new ScoreRoundAction(userInterface);
 
     var scoreMax = scoreRound.getMaxScore();
-
     makeRound.setLocale(locale);
 
-    makeRound.execute(function(correctTemp, correctStateIndex) {
+    var scoreGame = new ScoreGameAction(userInterface, scoreMax);
 
-        scoreRound.setCorrectTemp(correctTemp);
-        scoreRound.setCorrectStateIndex(correctStateIndex);
-        scoreRound.setLocale(locale);
-    });
-
-    userInterface.setGuessCallback(function() {
-        scoreRound.execute(function(score) {
-            userInterface.setScore(score);
-            userInterface.setRound(1,10);
+    var roundSequence = function() {
+        makeRound.execute(function(correctTemp, correctStateIndex) {
+            scoreRound.setCorrectTemp(correctTemp);
+            scoreRound.setCorrectStateIndex(correctStateIndex);
+            scoreRound.setLocale(locale);
         });
-    });
+        userInterface.setContinueCallback("guess", function() {
+            scoreRound.execute(function(score) {
+                scoreGame.execute(score);
+                userInterface.setContinueCallback("continue", function() {
+                    if (scoreGame.getShouldContinue()) {
+                        roundSequence(); // recursion!
+                    }
+                });
+            });
+        });
+    }
+    roundSequence();
 }
 
 $(document).ready(function() {
