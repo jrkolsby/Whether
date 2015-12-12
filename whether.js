@@ -14,35 +14,35 @@ var Weather = function(){
     this.getWeatherState = function() { return weatherState }
 
     //set a new random city
-    this.setCity = function(cityID, complete) {
+    this.setCity = function(aCityID, aComplete) {
 
         var self = this; // Preserve context outside AJAX
 
         //call API and store to fields
-        $.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + cityID + "&APPID=" + keys.weather, function(data){
+        $.getJSON("http://api.openweathermap.org/data/2.5/weather?id=" + aCityID + "&APPID=" + keys.weather, function(data){
 
             // Function calls default to "window" as their context, must specify self.
             updateCityData.call(self, data);
-            complete.call(self);
+            aComplete.call(self);
         });
     }
 
-    var updateCityData = function(data) {
+    var updateCityData = function(aData) {
 
-        cityName = data.name;
+        cityName = aData.name;
 
-        cityCoord = { lat: parseFloat(data.coord.lat),
-                      lng: parseFloat(data.coord.lon) };
+        cityCoord = { lat: parseFloat(aData.coord.lat),
+                      lng: parseFloat(aData.coord.lon) };
 
-        temp = data.main.temp;
+        temp = aData.main.temp;
 
-        var stateID = data.weather[0].id;
+        var stateID = aData.weather[0].id;
         weatherState = weatherStateList[stateID];
 
     }
 }
 
-var Map = function(mapID) {
+var Map = function(aMapID) {
 
     // TODO: Integrate GeoCoder API to get country name from coords
 
@@ -68,7 +68,7 @@ var Map = function(mapID) {
     }
 
     var updateMap = function() {
-        var map = new google.maps.Map(document.getElementById(mapID), myOptions);
+        var map = new google.maps.Map(document.getElementById(aMapID), myOptions);
 
         var marker = new google.maps.Marker({
             position: myOptions.center,
@@ -115,14 +115,14 @@ var UserInterface = function() {
         RIGHT_STATE_CLASS = "r",
         LEFT_STATE_CLASS = "l";
 
-    this.setCity = function(c) {
+    this.setCity = function(aCity) {
         // TODO: Add linebreaks to long names
-        element.city.text(c);
+        element.city.text(aCity);
     }
-    this.setCountry = function(c) { element.country.text(c) }
+    this.setCountry = function(aCountry) { element.country.text(aCountry) }
 
-    this.setWeatherState = function(a) {
-        weatherStates = a;
+    this.setWeatherState = function(aStateList) {
+        weatherStates = aStateList;
         weatherStateIndex = 0;
 
         element.stateParent.children().remove();
@@ -133,25 +133,25 @@ var UserInterface = function() {
         updateWeatherState();
     }
 
-    this.setTemperature = function(t) {
-        temp = t;
-        element.temp.text(t);
+    this.setTemperature = function(aTemp) {
+        temp = aTemp;
+        element.temp.text(aTemp);
     }
 
     this.getWeatherStateIndex = function() { return weatherStateIndex }
     this.getTemperature = function() { return temp }
 
-    this.setContinueCallback = function(t, callback) {
-        element.button.text(t)
+    this.setContinueCallback = function(aText, aCallback) {
+        element.button.text(aText)
                       .unbind("click")
-                      .click(function() { callback() });
+                      .click(function() { aCallback() });
     }
-    this.setRound = function(i, j) { element.round.text(i + "/" + j) }
-    this.setScore = function(i) { element.score.text(i) }
+    this.setRound = function(aCurrRound, aMaxRound) { element.round.text(aCurrRound + "/" + aMaxRound) }
+    this.setScore = function(aCurrScore) { element.score.text(aCurrScore) }
 
-    var changeTemperature = function(dt) {
+    var changeTemperature = function(aDeltaTemp) {
 
-        temp += dt;
+        temp += aDeltaTemp;
 
         if (temp >= MAX_TEMPERATURE) { temp = MIN_TEMPERATURE + (temp - MAX_TEMPERATURE) }
         if (temp <= MIN_TEMPERATURE) { temp = MAX_TEMPERATURE - (MIN_TEMPERATURE - temp) }
@@ -267,7 +267,7 @@ var UserInterface = function() {
     });
 }
 
-var MakeRoundAction = function(userInterface, map, weather) {
+var MakeRoundAction = function(aUserInterface, aMap, aWeather) {
 
     var WEATHER_STATE_OPTIONS = 10,
         MINIMUM_TEMP_K = 300,
@@ -281,21 +281,21 @@ var MakeRoundAction = function(userInterface, map, weather) {
         weatherStates = [],
         correctStateIndex = 0;
 
-    this.setLocale = function(i) { locale = i }
+    this.setLocale = function(aLocale) { locale = aLocale }
 
-    this.execute = function(complete) {
+    this.execute = function(aComplete) {
 
         // Preserve context
         var self = this;
 
-        weather.setCity(getRandomCityID(), function() {
+        aWeather.setCity(getRandomCityID(), function() {
 
             makeStates.call(self);
 
             updateInterface.call(self);
             updateMap.call(self);
 
-            complete(temp, correctStateIndex);
+            aComplete(temp, correctStateIndex);
         });
     }
 
@@ -318,17 +318,17 @@ var MakeRoundAction = function(userInterface, map, weather) {
         return randomCityID;
     }
 
-    var convertTemperature = function(t1) {
+    var convertTemperature = function(aTemp) {
         var t2 = 0;
         switch(locale) {
             case FARENHEIT:
-                t2 = Math.round(1.8*(t1-273.15)+32);
+                t2 = Math.round(1.8*(aTemp-273.15)+32);
                 break;
             case CELCIUS:
-                t2 = Math.round(t1 - 273.15);
+                t2 = Math.round(aTemp - 273.15);
                 break;
             default:
-                t2 = Math.round(t1);
+                t2 = Math.round(aTemp);
                 break;
         }
         return t2;
@@ -344,10 +344,10 @@ var MakeRoundAction = function(userInterface, map, weather) {
 
     var makeStates = function() {
 
-        var tempK = weather.getTemp(),
-            cityName = weather.getCityName(),
-            coordObj = weather.getCityCoord(),
-            weatherState = weather.getWeatherState();
+        var tempK = aWeather.getTemp(),
+            cityName = aWeather.getCityName(),
+            coordObj = aWeather.getCityCoord(),
+            weatherState = aWeather.getWeatherState();
 
         city = cityName;
         coord = coordObj;
@@ -375,13 +375,13 @@ var MakeRoundAction = function(userInterface, map, weather) {
     }
 
     var updateInterface = function() {
-        userInterface.setCity(city);
-        userInterface.setCountry(coordString);
-        userInterface.setWeatherState(weatherStates);
-        userInterface.setTemperature(initialTemp);
+        aUserInterface.setCity(city);
+        aUserInterface.setCountry(coordString);
+        aUserInterface.setWeatherState(weatherStates);
+        aUserInterface.setTemperature(initialTemp);
     }
 
-    var updateMap = function() { map.setCoord(coord) }
+    var updateMap = function() { aMap.setCoord(coord) }
 }
 
 var ScoreRoundAction = function(userInterface) {
