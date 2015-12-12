@@ -429,19 +429,32 @@ var ScoreRoundAction = function(userInterface) {
     }
 }
 
-var ScoreGameAction = function(userInterface, scoreMax) {
+var TrackGameAction = function(userInterface, scoreMax) {
     var TOTAL_ROUNDS = 10;
 
     var score = 0,
         round = 0,
-        scoreMax = scoreMax;
+        aScoreMax = scoreMax;
 
     this.execute = function(s) {
         score += s;
         round += 1;
-        userInterface.setScore(score, scoreMax);
+        console.log(round);
+        userInterface.setScore(score, aScoreMax);
         userInterface.setRound(round, TOTAL_ROUNDS);
     }
+
+    this.executeRound = function() {
+        round += 1;
+        userInterface.setRound(round, TOTAL_ROUNDS);
+        console.log("round: " + round);
+    }
+
+    this.executeScore = function(s) {
+        score += s;
+        userInterface.setScore(score, aScoreMax);
+    }
+
     this.getScore = function() { return score }
     this.getRound = function() { return round }
     this.getShouldContinue = function() { return round < TOTAL_ROUNDS }
@@ -451,29 +464,42 @@ var Game = function() {
 
     var locale = FARENHEIT;
 
+    //global
     var userInterface = new UserInterface();
     var map = new Map("map");
     var weather = new Weather();
 
+    //must be local
     var makeRound = new MakeRoundAction(userInterface, map, weather);
     var scoreRound = new ScoreRoundAction(userInterface);
-
+    
+    //global
+    var trackGame = new TrackGameAction(userInterface, scoreMax);
     var scoreMax = scoreRound.getMaxScore();
-    makeRound.setLocale(locale);
-
-    var scoreGame = new ScoreGameAction(userInterface, scoreMax);
+    trackGame.executeScore(0);
 
     var roundSequence = function() {
+        //redeclare
+        var makeRound = new MakeRoundAction(userInterface, map, weather);
+        var scoreRound = new ScoreRoundAction(userInterface);
+
+        makeRound.setLocale(locale);
+
         makeRound.execute(function(correctTemp, correctStateIndex) {
             scoreRound.setCorrectTemp(correctTemp);
             scoreRound.setCorrectStateIndex(correctStateIndex);
             scoreRound.setLocale(locale);
+            trackGame.executeRound();
         });
+
         userInterface.setContinueCallback("guess", function() {
             scoreRound.execute(function(score) {
-                scoreGame.execute(score);
+                trackGame.executeScore(score);
+                //trackGame.execute(score);
                 userInterface.setContinueCallback("continue", function() {
-                    if (scoreGame.getShouldContinue()) {
+                    if (trackGame.getShouldContinue()) {
+                        delete makeRound;
+                        delete scoreRound;
                         roundSequence(); // recursion!
                     }
                 });
