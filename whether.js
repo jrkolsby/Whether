@@ -80,8 +80,6 @@ var Map = function(mapID) {
 
 var UserInterface = function() {
 
-    //TODO: Put bottom / top limits on temperature
-
     var SCROLL_TEMP_RATIO = 50,
         SCROLL_DESC_RATIO = 100;
 
@@ -108,7 +106,9 @@ var UserInterface = function() {
         stateParent:   $("#forcast .state"),
         stateChild:    "<span></span>",
         icon:          $("#forcast .icon"),
-        guessButton:   $("button#guess")
+        guessButton:   $("button#guess"),
+        score:         $("h2#score"),
+        round:         $("h2#round")
     }
 
     var MIDDLE_STATE_CLASS = "m",
@@ -146,6 +146,8 @@ var UserInterface = function() {
             callback();
         });
     }
+    this.setRound = function(i, j) { element.round.text(i + "/" + j) }
+    this.setScore = function(i) { element.score.text(i) }
 
     var changeTemperature = function(dt) {
 
@@ -453,7 +455,8 @@ var Game = function() {
 
     userInterface.setGuessCallback(function() {
         scoreRound.execute(function(score) {
-            console.log(score + " pts!");
+            userInterface.setScore(score);
+            userInterface.setRound(1,10);
         });
     });
 }
